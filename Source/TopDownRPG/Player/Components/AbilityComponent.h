@@ -10,6 +10,7 @@
 #include "TopDownRPG/Player/Ability/Ability.h"
 #include "TopDownRPG/Player/Ability/Casting/DirectionCaster.h"
 #include "TopDownRPG/Player/Ability/Casting/TargetCaster.h"
+#include "TopDownRPG/UI/HUD/PlayerHUD.h"
 #include "AbilityComponent.generated.h"
 
 UCLASS()
@@ -17,6 +18,7 @@ class TOPDOWNRPG_API UAbilityComponent : public URPGActorComponentBase
 {
 	GENERATED_BODY()
 
+	const int MAX_ABILITIES_COUNT = 6;
 public:
 	// Sets default values for this component's properties
 	UAbilityComponent();
@@ -57,11 +59,15 @@ protected:
 	TSubclassOf<ATargetCaster> TargetCasterClass;
 	
 	UPROPERTY()
-	AAbility* CurrentAbility;
+	AAbility* CurrentCastingAbility;
 	UPROPERTY()
 	ACaster* CurrentCastingIndicator;
 	UPROPERTY()
 	ATopDownRPGPlayerController* PlayerController;
+	UPROPERTY(Transient)
+	UPlayerHUD* PlayerHUD = nullptr;
+	UPROPERTY()
+	TArray<AAbility*> CurrentAbilities;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -79,8 +85,10 @@ protected:
 	void OnAbility5();
 	UFUNCTION()
 	void OnAbility6();
-
-	void TryUseAbility(TSubclassOf<AAbility> Ability);
-	void SpawnAbility(TSubclassOf<AAbility> Ability);
-	void CastAbility(AAbility* Ability);
+	UFUNCTION()
+	void CastAbility();
+	
+	void TryUseAbility(AAbility* Ability);
+	void InitAbility(AAbility* Ability);
+	void ChangeAbilityOnIndex(int Index, TSubclassOf<AAbility> AbilityClass);
 };

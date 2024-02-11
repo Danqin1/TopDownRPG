@@ -6,6 +6,7 @@
 #include "AbilityEffect.h"
 #include "GameFramework/Actor.h"
 #include "TopDownRPG/TopDownRPG.h"
+#include "TopDownRPG/UI/HUD/W_ActionSlot.h"
 #include "Ability.generated.h"
 
 UCLASS(Abstract)
@@ -13,6 +14,11 @@ class TOPDOWNRPG_API AAbility : public AActor
 {
 	GENERATED_BODY()
 
+protected:
+	float RechargeTime = 0;
+	
+	UPROPERTY()
+	UW_ActionSlot* UISlot;
 public:
 	// Sets default values for this actor's properties
 	AAbility();
@@ -49,4 +55,6 @@ public:
 	
 	virtual bool CanUseAbility();
 	virtual void Activate(ACharacter* Caster);
+	virtual void SetUISlot(UW_ActionSlot* Slot);
+	virtual void Tick(float DeltaSeconds) override;
 };

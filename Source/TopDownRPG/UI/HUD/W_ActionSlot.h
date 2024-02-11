@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
+#include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "W_ActionSlot.generated.h"
 
@@ -19,5 +20,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	UImage* Icon;
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
+	UProgressBar* CooldownOverlay;
+	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	UTextBlock* Name;
+
+	void UpdateRecharge(float progress);
 };

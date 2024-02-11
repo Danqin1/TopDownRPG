@@ -5,13 +5,13 @@
 
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "TopDownRPG/DevDebug.h"
 
 
 // Sets default values
 AAbility_Slash::AAbility_Slash()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 }
 
@@ -25,6 +25,7 @@ void AAbility_Slash::BeginPlay()
 void AAbility_Slash::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	DevDebug::OnScreenLog("Slash recharge:" +FString::SanitizeFloat(RechargeTime), FColor::Black, .1);
 }
 
 void AAbility_Slash::Activate(ACharacter* Caster)

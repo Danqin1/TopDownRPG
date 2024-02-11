@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ZoomSpeed = 1;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	float MeleeAttackRange = 300;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float MeleeBaseDamage = 10;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float PushEnemiesStrength = 10;
 };

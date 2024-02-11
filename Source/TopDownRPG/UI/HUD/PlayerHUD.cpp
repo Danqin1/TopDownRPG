@@ -50,4 +50,18 @@ void UPlayerHUD::SetAction(int slot, FString name, UTexture2D* icon)
 	}
 }
 
+UW_ActionSlot* UPlayerHUD::GetUISlot(int index)
+{
+	switch (index)
+	{
+	case 0: return Action_0;
+	case 1: return Action_1;
+	case 2: return Action_2;
+	case 3: return Action_3;
+	case 4: return PrimaryAction;
+	case 5: return SecondaryAction;
+		default: return nullptr;
+	}
+}
+
 

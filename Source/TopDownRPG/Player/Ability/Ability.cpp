@@ -4,6 +4,7 @@
 #include "Ability.h"
 
 #include "GameFramework/Character.h"
+#include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Player/Components/PlayerStatsComponent.h"
 
 
@@ -11,15 +12,20 @@
 AAbility::AAbility()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 }
 
 bool AAbility::CanUseAbility()
 {
-	if(UPlayerStatsComponent* Stats = CasterCharacter->FindComponentByClass<UPlayerStatsComponent>())
+	if(!CasterCharacter)
 	{
-		return Stats->GetMana() > ManaCost;
+		DevDebug::OnScreenLog("Caster is NULL");
+		return false;
+	}
+	if (UPlayerStatsComponent* Stats = CasterCharacter->FindComponentByClass<UPlayerStatsComponent>())
+	{
+		return Stats->GetMana() > ManaCost && RechargeTime <= 0;
 	}
 	return false;
 }
@@ -27,32 +33,56 @@ bool AAbility::CanUseAbility()
 void AAbility::Activate(ACharacter* Caster)
 {
 	CasterCharacter = Caster;
-	if(CanUseAbility())
+	RechargeTime = Cooldown;
+	if (UPlayerStatsComponent* Stats = CasterCharacter->FindComponentByClass<UPlayerStatsComponent>())
 	{
-		if(UPlayerStatsComponent* Stats = CasterCharacter->FindComponentByClass<UPlayerStatsComponent>())
-		{
-			Stats->RemoveMana(ManaCost);
-		}
-		
-		for (auto Effect : Effects)
-		{
-			const FTransform Transform = TargetCharacter ? TargetCharacter->GetTransform() : Caster->GetTransform();
-			AAbilityEffect* AbilityEffect = GetWorld()->SpawnActor<AAbilityEffect>(Effect, Transform);
+		Stats->RemoveMana(ManaCost);
+	}
 
-			if(AbilityEffect)
-			{
-				AbilityEffect->Activate(Caster);
-			}
-			else
-			{
-				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Ability effect spawn failed");
-			}
+	for (auto Effect : Effects)
+	{
+		const FTransform Transform = TargetCharacter ? TargetCharacter->GetTransform() : Caster->GetTransform();
+		AAbilityEffect* AbilityEffect = GetWorld()->SpawnActor<AAbilityEffect>(Effect, Transform);
+
+		if (AbilityEffect)
+		{
+			AbilityEffect->Activate(Caster);
+		}
+		else
+		{
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Ability effect spawn failed");
 		}
 	}
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+	PrimaryActorTick.SetTickFunctionEnable(true);
+}
+
+void AAbility::SetUISlot(UW_ActionSlot* Slot)
+{
+	UISlot = Slot;
+	if(UISlot)
 	{
-		Destroy();
-	}, 1, false, 1);
+		UISlot->UpdateRecharge(RechargeTime / Cooldown);
+	}
+	else
+	{
+		DevDebug::OnScreenLog("Action UI Slot not exists", FColor::Red);
+	}
+}
+
+void AAbility::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if(RechargeTime > 0)
+	{
+		RechargeTime = FMathf::Max(0, RechargeTime - DeltaSeconds);
+		if(UISlot)
+		{
+			UISlot->UpdateRecharge(RechargeTime / Cooldown);
+		}
+	}
+	else
+	{
+		PrimaryActorTick.SetTickFunctionEnable(false);
+	}
 }

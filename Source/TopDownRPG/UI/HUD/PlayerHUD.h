@@ -39,4 +39,6 @@ public:
 	void SetHP(float Percent);
 	void SetMana(float Percent);
 	void SetAction(int slot, FString name, UTexture2D* icon);
+
+	UW_ActionSlot* GetUISlot(int index);
 };

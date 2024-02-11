@@ -13,6 +13,8 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "TopDownRPG/DevDebug.h"
+#include "TopDownRPG/Enemy/EnemyCharacter.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 
 ATopDownRPGCharacter::ATopDownRPGCharacter()
@@ -76,6 +78,15 @@ void ATopDownRPGCharacter::BeginPlay()
 			RPGComponent->SetupComponent();
 		}
 	}
+
+	if(Settings)
+	{
+		CurrentDamage = Settings->MeleeBaseDamage;
+	}
+	else
+	{
+		DevDebug::OnScreenLog("Missing Player Settings!");
+	}
 }
 
 void ATopDownRPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -117,9 +128,27 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 		{
 			if(!DamagedActors.Contains(OutResult.GetActor()))
 			{
-				if(auto* Enemy = Cast<IIDamageable>(OutResult.GetActor()))
+				if(auto* Damageable = Cast<IIDamageable>(OutResult.GetActor()))
 				{
-					Enemy->Damage(InventoryComponent->GetCurrentWeaponDamage());
+					Damageable->Damage(CurrentDamage);
+					if(auto* Enemy = Cast<AEnemyCharacter>(Damageable))
+					{
+						FVector Location = Enemy->GetActorLocation();
+						FVector LaunchDir = Location - GetActorLocation();
+						
+						Enemy->LaunchCharacter(LaunchDir * Settings->PushEnemiesStrength, false, false);
+					}
+
+					if(DamageIndicator)
+					{
+						// self destroyed
+						ADamageIndicatorActor* Damage = GetWorld()->SpawnActor<ADamageIndicatorActor>(DamageIndicator, OutResult.Location, FRotator::ZeroRotator);
+						if(Damage)
+						{
+							Damage->Show(CurrentDamage);
+						}
+					}
+					
 					DamagedActors.Add(OutResult.GetActor());
 				}
 			}
@@ -144,4 +173,14 @@ void ATopDownRPGCharacter::StartSwordTrace()
 void ATopDownRPGCharacter::EndSwordTrace()
 {
 	bIsTracingSword = false;
+}
+
+void ATopDownRPGCharacter::ModifyDamage(float NewDamage)
+{
+	CurrentDamage = NewDamage;
+}
+
+void ATopDownRPGCharacter::ClearDamageModifier()
+{
+	CurrentDamage = InventoryComponent->GetCurrentWeaponDamage();
 }

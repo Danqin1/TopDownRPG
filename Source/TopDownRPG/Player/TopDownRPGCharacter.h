@@ -7,6 +7,7 @@
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "GameFramework/Character.h"
+#include "TopDownRPG/UI/DamageIndicatorActor.h"
 #include "TopDownRPG/UI/HUD/PlayerHUD.h"
 #include "TopDownRPGCharacter.generated.h"
 
@@ -38,10 +39,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
 	float SwordTraceDelay = 0.05;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	UPlayerSettings* Settings = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Indication")
+	TSubclassOf<ADamageIndicatorActor> DamageIndicator;
+
 	bool bIsTracingSword = false;
 	float lastSwordTrace = 0;
 
+	UPROPERTY()
 	TArray<AActor*> DamagedActors;
+
+	float CurrentDamage = 0;
 public:
 	ATopDownRPGCharacter();
 
@@ -61,5 +71,7 @@ public:
 	void SetAutoAttack(bool enabled);
 	void StartSwordTrace();
 	void EndSwordTrace();
+	void ModifyDamage(float NewDamage);
+	void ClearDamageModifier();
 };
 

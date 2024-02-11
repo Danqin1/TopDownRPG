@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "TopDownRPG/DevDebug.h"
+#include "TopDownRPG/Player/TopDownRPGCharacter.h"
 #include "TopDownRPG/Player/TopDownRPGPlayerController.h"
 
 
@@ -14,6 +16,8 @@ UAbilityComponent::UAbilityComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
+
+	CurrentAbilities.SetNum(MAX_ABILITIES_COUNT, false);
 }
 
 void UAbilityComponent::SetupComponent()
@@ -22,6 +26,20 @@ void UAbilityComponent::SetupComponent()
 	{
 		PlayerController = CharacterPC;
 	}
+
+	if(ATopDownRPGCharacter* Player = Cast<ATopDownRPGCharacter>(GetOwner()))
+	{
+		PlayerHUD = Player->PlayerHUD;
+		check(PlayerHUD);
+	}
+	
+	//Initial setup abiities for tests
+	ChangeAbilityOnIndex(0, Ability1);
+	ChangeAbilityOnIndex(1, Ability2);
+	ChangeAbilityOnIndex(2, Ability3);
+	ChangeAbilityOnIndex(3, Ability4);
+	ChangeAbilityOnIndex(4, Ability5);
+	ChangeAbilityOnIndex(5, Ability6);
 }
 
 void UAbilityComponent::Dispose()
@@ -31,7 +49,7 @@ void UAbilityComponent::Dispose()
 void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
-	if(CurrentCastingIndicator && CurrentAbility)
+	if(CurrentCastingIndicator && CurrentCastingAbility)
 	{
 		if(PlayerController)
 		{
@@ -39,7 +57,7 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			FVector MouseDirection = Hit.Location - GetOwner()->GetActorLocation();
 			MouseDirection.Normalize();
 			
-			switch (CurrentAbility->CastType)
+			switch (CurrentCastingAbility->CastType)
 			{
 			case Direction:
 				CurrentCastingIndicator->SetActorLocation(GetOwner()->GetActorLocation()
@@ -54,8 +72,6 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
-
-// Called when the game starts
 void UAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -69,12 +85,12 @@ void UAbilityComponent::BeginPlay()
 		Input->BindAction(Ability5Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility5);
 		Input->BindAction(Ability6Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility6);
 
-		Input->BindAction(Ability1Action, ETriggerEvent::Completed, this, &UAbilityComponent::OnAbility1);
-		Input->BindAction(Ability2Action, ETriggerEvent::Completed, this, &UAbilityComponent::OnAbility2);
-		Input->BindAction(Ability3Action, ETriggerEvent::Completed, this, &UAbilityComponent::OnAbility3);
-		Input->BindAction(Ability4Action, ETriggerEvent::Completed, this, &UAbilityComponent::OnAbility4);
-		Input->BindAction(Ability5Action, ETriggerEvent::Completed, this, &UAbilityComponent::OnAbility5);
-		Input->BindAction(Ability6Action, ETriggerEvent::Completed, this, &UAbilityComponent::OnAbility6);
+		Input->BindAction(Ability1Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
+		Input->BindAction(Ability2Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
+		Input->BindAction(Ability3Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
+		Input->BindAction(Ability4Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
+		Input->BindAction(Ability5Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
+		Input->BindAction(Ability6Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
 	}
 }
 
@@ -85,58 +101,51 @@ void UAbilityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UAbilityComponent::OnAbility1()
 {
-	TryUseAbility(Ability1);
+	TryUseAbility(CurrentAbilities[0]);
 }
 
 void UAbilityComponent::OnAbility2()
 {
-	TryUseAbility(Ability2);
+	TryUseAbility(CurrentAbilities[1]);
 }
 
 void UAbilityComponent::OnAbility3()
 {
-	TryUseAbility(Ability3);
+	TryUseAbility(CurrentAbilities[2]);
 }
 
 void UAbilityComponent::OnAbility4()
 {
-	TryUseAbility(Ability4);
+	TryUseAbility(CurrentAbilities[3]);
 }
 
 void UAbilityComponent::OnAbility5()
 {
-	TryUseAbility(Ability5);
+	TryUseAbility(CurrentAbilities[4]);
 }
 
 void UAbilityComponent::OnAbility6()
 {
-	TryUseAbility(Ability6);
+	TryUseAbility(CurrentAbilities[5]);
 }
 
-void UAbilityComponent::TryUseAbility(TSubclassOf<AAbility> Ability)
+void UAbilityComponent::TryUseAbility(AAbility* Ability)
 {
-	if(CurrentAbility)
+	if(Ability && Ability->CanUseAbility())
 	{
-		CastAbility(CurrentAbility);
-	}
-	else if(Ability)
-	{
-		SpawnAbility(Ability);
+		InitAbility(Ability);
 	}
 }
 
-void UAbilityComponent::SpawnAbility(TSubclassOf<AAbility> Ability)
+void UAbilityComponent::InitAbility(AAbility* Ability)
 {
-	CurrentAbility = GetWorld()->SpawnActor<AAbility>(Ability);
-	if(CurrentAbility)
+	CurrentCastingAbility = Ability;
+	if(CurrentCastingAbility)
 	{
-		switch (CurrentAbility->CastType)
+		switch (CurrentCastingAbility->CastType)
 		{
 		case None:
-			if(ACharacter* Character = Cast<ACharacter>(GetOwner()))
-			{
-				CurrentAbility->Activate(Character);
-			}
+			CurrentCastingAbility->Activate(PlayerController->GetCharacter());
 			break;
 		case Direction:
 			CurrentCastingIndicator = GetWorld()->SpawnActor<ACaster>(DirectionalCasterClass, GetOwner()->GetTransform());
@@ -146,14 +155,13 @@ void UAbilityComponent::SpawnAbility(TSubclassOf<AAbility> Ability)
 			break;
 		}
 	}
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, CurrentAbility ? "Ability Spawned" : "Ability spawn failed");
 }
 
-void UAbilityComponent::CastAbility(AAbility* Ability)
+void UAbilityComponent::CastAbility()
 {
-	if(CurrentAbility->CastType == None)
+	if(!CurrentCastingAbility || CurrentCastingAbility->CastType == None)
 	{
-		CurrentAbility = nullptr;
+		CurrentCastingAbility = nullptr;
 		return;
 	}
 
@@ -168,15 +176,55 @@ void UAbilityComponent::CastAbility(AAbility* Ability)
 		
 		if(ACharacter* Character =  Cast<ACharacter>(HitResult.GetActor()))
 		{
-			Ability->TargetCharacter = Character;
+			CurrentCastingAbility->TargetCharacter = Character;
 		}
 		
-		Ability->CastLocation = HitResult.Location;
-		Ability->SetActorLocation(GetOwner()->GetActorLocation());
-		Ability->Activate(PlayerController->GetCharacter());
-		//clear current ability
-		CurrentAbility = nullptr;
-		if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "Ability Casted");
+		CurrentCastingAbility->CastLocation = HitResult.Location;
+		CurrentCastingAbility->SetActorLocation(GetOwner()->GetActorLocation());
+		CurrentCastingAbility->Activate(PlayerController->GetCharacter());
+
+		CurrentCastingAbility = nullptr;
+	}
+}
+
+void UAbilityComponent::ChangeAbilityOnIndex(int Index, TSubclassOf<AAbility> AbilityClass)
+{
+	if(Index <  MAX_ABILITIES_COUNT)
+	{
+		if(CurrentAbilities[Index])
+		{
+			GetWorld()->DestroyActor(CurrentAbilities[Index]);
+		}
+
+		if(AbilityClass)
+		{
+			CurrentAbilities[Index] = GetWorld()->SpawnActor<AAbility>(AbilityClass);
+			if(CurrentAbilities[Index] && PlayerHUD)
+			{
+				CurrentAbilities[Index]->SetUISlot(PlayerHUD->GetUISlot(Index));
+				
+				if(ACharacter* Character = Cast<ACharacter>(GetOwner()))
+				{
+					CurrentAbilities[Index]->CasterCharacter = Character;
+				}
+				else
+				{
+					DevDebug::OnScreenLog("Cant set up Caster");
+				}
+			}
+			else
+			{
+				DevDebug::OnScreenLog("Cant set UI slot", FColor::Red, 5);
+			}
+		}
+		else
+		{
+			DevDebug::OnScreenLog("Ability not set up: " + FString::SanitizeFloat(Index));
+		}
+	}
+	else
+	{
+		DevDebug::OnScreenLog("Index higher than abilities array");
 	}
 }
 

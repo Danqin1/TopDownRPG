@@ -13,15 +13,12 @@ AAbilityEffect::AAbilityEffect()
 
 void AAbilityEffect::Activate(ACharacter* Caster)
 {
+	Destroy();
 }
 
 // Called when the game starts or when spawned
 void AAbilityEffect::BeginPlay()
 {
 	Super::BeginPlay();
-	if(GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, "Ability effect");
-	}
 }
 

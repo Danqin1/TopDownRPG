@@ -2,3 +2,11 @@
 
 
 #include "W_ActionSlot.h"
+
+void UW_ActionSlot::UpdateRecharge(float progress)
+{
+	if(CooldownOverlay)
+	{
+		CooldownOverlay->SetPercent(progress);
+	}
+}
