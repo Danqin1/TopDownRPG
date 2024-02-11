@@ -11,19 +11,17 @@ AAbilityEffect::AAbilityEffect()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
+void AAbilityEffect::Activate(ACharacter* Caster)
+{
+}
+
 // Called when the game starts or when spawned
 void AAbilityEffect::BeginPlay()
 {
 	Super::BeginPlay();
 	if(GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "Ability effect");
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, "Ability effect");
 	}
-}
-
-// Called every frame
-void AAbilityEffect::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 

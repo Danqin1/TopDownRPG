@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/AbilityComponent.h"
+#include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "GameFramework/Character.h"
 #include "TopDownRPG/UI/HUD/PlayerHUD.h"
@@ -29,6 +30,8 @@ protected:
 	UPlayerStatsComponent* PlayerStatsComponent;
 	UPROPERTY(EditDefaultsOnly)
 	UAbilityComponent* AbilityComponent;
+	UPROPERTY(EditDefaultsOnly)
+	UInventoryComponent* InventoryComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
 	float SwordTraceRadius = 20;
@@ -37,6 +40,8 @@ protected:
 
 	bool bIsTracingSword = false;
 	float lastSwordTrace = 0;
+
+	TArray<AActor*> DamagedActors;
 public:
 	ATopDownRPGCharacter();
 

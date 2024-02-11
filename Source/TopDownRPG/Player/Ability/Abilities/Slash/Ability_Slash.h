@@ -16,8 +16,7 @@ public:
 	AAbility_Slash();
 
 protected:
-	UPROPERTY(EditDefaultsOnly)
-	UAnimMontage* SlashAnimation = nullptr;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

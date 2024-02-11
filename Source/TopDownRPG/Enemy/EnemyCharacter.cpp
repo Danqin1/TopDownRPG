@@ -11,8 +11,9 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AEnemyCharacter::OnHit()
+void AEnemyCharacter::Damage(float Damage)
 {
+	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "Damaged by: "+ FString::SanitizeFloat(Damage));
 }
 
 // Called when the game starts or when spawned

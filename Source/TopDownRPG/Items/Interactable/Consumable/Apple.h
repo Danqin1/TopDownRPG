@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TopDownRPG/Items/ItemBase.h"
 #include "TopDownRPG/Items/Interactable/InteractableBase.h"
-#include "TopDownRPG/Items/Interfaces/Interactable.h"
 #include "Apple.generated.h"
 
 UCLASS()

@@ -19,6 +19,7 @@ public:
 	
 	// Sets default values for this component's properties
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	virtual void SetupComponent() override;
 	virtual void Dispose() override;
@@ -39,6 +40,7 @@ protected:
 	float MaxHP = 100;
 	float Mana = 100;
 	float MaxMana = 100;
+	float ManaRegen = .1;
 
 	void UpdateHUD();
 

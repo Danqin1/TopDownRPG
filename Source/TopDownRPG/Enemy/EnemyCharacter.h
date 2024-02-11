@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enemy.h"
 #include "GameFramework/Character.h"
+#include "TopDownRPG/Interfaces/IDamageable.h"
 #include "EnemyCharacter.generated.h"
 
 UCLASS()
-class TOPDOWNRPG_API AEnemyCharacter : public ACharacter, public IEnemy
+class TOPDOWNRPG_API AEnemyCharacter : public ACharacter, public IIDamageable
 {
 private:
 	GENERATED_BODY()
@@ -16,7 +16,7 @@ private:
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
-	virtual void OnHit() override;
+	virtual void Damage(float Damage) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

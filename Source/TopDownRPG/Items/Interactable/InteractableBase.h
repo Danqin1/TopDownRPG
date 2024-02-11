@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TopDownRPG/Items/ItemBase.h"
-#include "TopDownRPG/Items/Interfaces/Interactable.h"
+#include "TopDownRPG/Interfaces/Interactable.h"
 #include "TopDownRPG/Player/TopDownRPGPlayerController.h"
 #include "InteractableBase.generated.h"
 

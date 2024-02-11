@@ -22,10 +22,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float Damage = 10;
 protected:
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* SlashAnimation = nullptr;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	float LifeTime = 0;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void Activate(ACharacter* Caster) override;
 };

@@ -38,8 +38,21 @@ void AAbility::Activate(ACharacter* Caster)
 		{
 			const FTransform Transform = TargetCharacter ? TargetCharacter->GetTransform() : Caster->GetTransform();
 			AAbilityEffect* AbilityEffect = GetWorld()->SpawnActor<AAbilityEffect>(Effect, Transform);
+
+			if(AbilityEffect)
+			{
+				AbilityEffect->Activate(Caster);
+			}
+			else
+			{
+				if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Ability effect spawn failed");
+			}
 		}
 	}
 
-	Destroy();
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+	{
+		Destroy();
+	}, 1, false, 1);
 }

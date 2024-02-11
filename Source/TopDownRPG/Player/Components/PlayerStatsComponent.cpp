@@ -11,9 +11,18 @@ UPlayerStatsComponent::UPlayerStatsComponent(const FObjectInitializer& ObjectIni
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
-	PrimaryComponentTick.bStartWithTickEnabled = false;
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 	// ...
+}
+
+void UPlayerStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	if(Mana < MaxMana)
+	{
+		AddMana(ManaRegen);
+	}
 }
 
 void UPlayerStatsComponent::SetupComponent()

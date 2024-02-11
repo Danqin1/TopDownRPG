@@ -5,9 +5,10 @@
 #include "CoreMinimal.h"
 #include "AbilityEffect.h"
 #include "GameFramework/Actor.h"
+#include "TopDownRPG/TopDownRPG.h"
 #include "Ability.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class TOPDOWNRPG_API AAbility : public AActor
 {
 	GENERATED_BODY()
@@ -32,10 +33,7 @@ public:
 	UTexture2D* Icon = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	bool UseCasting = false;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(EditCondition = "UseCasting"))
-	TSubclassOf<AActor> CastActor = nullptr;
+	TEnumAsByte<CastType> CastType = None;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TArray<TSubclassOf<class AAbilityEffect>> Effects;

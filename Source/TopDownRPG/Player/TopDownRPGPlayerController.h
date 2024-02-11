@@ -52,6 +52,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetInteractWith(AActor* Actor, float MaxRange);
+	
+	FHitResult GetLastMouseHit();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -79,7 +81,6 @@ protected:
 	void OnTouchTriggered();
 	void OnTouchReleased();
 	void OnZoomInOut(const FInputActionValue& Value);
-
 	void SetAutoAttack(bool enabled);
 };
 

@@ -6,9 +6,11 @@
 #include "InputAction.h"
 #include "RPGActorComponentBase.h"
 #include "Components/ActorComponent.h"
+#include "TopDownRPG/Player/TopDownRPGPlayerController.h"
 #include "TopDownRPG/Player/Ability/Ability.h"
+#include "TopDownRPG/Player/Ability/Casting/DirectionCaster.h"
+#include "TopDownRPG/Player/Ability/Casting/TargetCaster.h"
 #include "AbilityComponent.generated.h"
-
 
 UCLASS()
 class TOPDOWNRPG_API UAbilityComponent : public URPGActorComponentBase
@@ -20,7 +22,9 @@ public:
 	UAbilityComponent();
 	virtual void SetupComponent() override;
 	virtual void Dispose() override;
-
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction) override;
+protected:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* Ability1Action;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -29,6 +33,10 @@ public:
 	UInputAction* Ability3Action;
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	UInputAction* Ability4Action;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* Ability5Action;
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* Ability6Action;
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TSubclassOf<AAbility> Ability1;
@@ -38,9 +46,22 @@ public:
 	TSubclassOf<AAbility> Ability3;
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TSubclassOf<AAbility> Ability4;
-protected:
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	TSubclassOf<AAbility> Ability5;
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	TSubclassOf<AAbility> Ability6;
+
+	UPROPERTY(EditDefaultsOnly, Category="Casting")
+	TSubclassOf<ADirectionCaster> DirectionalCasterClass;
+	UPROPERTY(EditDefaultsOnly, Category="Casting")
+	TSubclassOf<ATargetCaster> TargetCasterClass;
+	
 	UPROPERTY()
 	AAbility* CurrentAbility;
+	UPROPERTY()
+	ACaster* CurrentCastingIndicator;
+	UPROPERTY()
+	ATopDownRPGPlayerController* PlayerController;
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -54,7 +75,12 @@ protected:
 	void OnAbility3();
 	UFUNCTION()
 	void OnAbility4();
+	UFUNCTION()
+	void OnAbility5();
+	UFUNCTION()
+	void OnAbility6();
 
+	void TryUseAbility(TSubclassOf<AAbility> Ability);
 	void SpawnAbility(TSubclassOf<AAbility> Ability);
 	void CastAbility(AAbility* Ability);
 };

@@ -10,8 +10,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "TopDownRPG/Enemy/Enemy.h"
-#include "TopDownRPG/Items/Interfaces/Interactable.h"
+#include "TopDownRPG/Interfaces/IDamageable.h"
+#include "TopDownRPG/Interfaces/Interactable.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -44,7 +44,7 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 
 	if(bHitSuccessful)
 	{
-		if(auto* Enemy = Cast<IEnemy>(Hit.GetActor()))
+		if(auto* Enemy = Cast<IIDamageable>(Hit.GetActor()))
 		{
 			CurrentMouseCursor = EMouseCursor::Crosshairs;
 		}
@@ -69,9 +69,13 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 			}
 			SetAutoAttack(false);
 		}
-		else if(IEnemy* Enemy = Cast<IEnemy>(CurrentInteractionActor))
+		else if(IIDamageable* Enemy = Cast<IIDamageable>(CurrentInteractionActor))
 		{
-			if(FVector::Dist(CurrentInteractionActor->GetActorLocation(), GetCharacter()->GetActorLocation()) < CurrentInteractionMaxRange)
+			FVector Dir = CurrentInteractionActor->GetActorLocation() - GetCharacter()->GetActorLocation();
+			float Dot = FVector::DotProduct(Dir, GetCharacter()->GetActorForwardVector());
+			
+			if(FVector::Dist(CurrentInteractionActor->GetActorLocation(), GetCharacter()->GetActorLocation()) < CurrentInteractionMaxRange
+				&& Dot > .6)
 			{
 				SetAutoAttack(true);
 			}
@@ -125,7 +129,7 @@ void ATopDownRPGPlayerController::SetupInputComponent()
 
 void ATopDownRPGPlayerController::OnInputStarted()
 {
-	if(auto* Enemy = Cast<IEnemy>(Hit.GetActor()))
+	if(auto* Enemy = Cast<IIDamageable>(Hit.GetActor()))
 	{
 		CurrentInteractionActor = Hit.GetActor();
 		CurrentInteractionMaxRange = Settings->MeleeAttackRange; // change later depends on weapon?
@@ -203,4 +207,9 @@ void ATopDownRPGPlayerController::SetAutoAttack(bool enabled)
 	{
 		RPGPlayer->SetAutoAttack(enabled);
 	}
+}
+
+FHitResult ATopDownRPGPlayerController::GetLastMouseHit()
+{
+	return Hit;
 }

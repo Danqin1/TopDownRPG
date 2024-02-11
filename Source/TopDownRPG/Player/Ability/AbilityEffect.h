@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "AbilityEffect.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class TOPDOWNRPG_API AAbilityEffect : public AActor
 {
 	GENERATED_BODY()
@@ -15,11 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	AAbilityEffect();
 
+	virtual void Activate(ACharacter* Caster);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditDefaultsOnly)
+	float PushEnemiesStrength = 1000;
 };

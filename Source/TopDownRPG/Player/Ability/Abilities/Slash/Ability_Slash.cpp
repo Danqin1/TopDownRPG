@@ -11,14 +11,14 @@
 AAbility_Slash::AAbility_Slash()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 }
 
 // Called when the game starts or when spawned
 void AAbility_Slash::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -30,10 +30,5 @@ void AAbility_Slash::Tick(float DeltaTime)
 void AAbility_Slash::Activate(ACharacter* Caster)
 {
 	Super::Activate(Caster);
-	if(Caster && SlashAnimation)
-	{
-		Caster->GetMovementComponent()->StopMovementImmediately();
-		Caster->PlayAnimMontage(SlashAnimation);
-	}
 }
 
