@@ -62,6 +62,11 @@ void AAbility::SetUISlot(UW_ActionSlot* Slot)
 	UISlot = Slot;
 	if(UISlot)
 	{
+		if(Icon)
+		{
+			UISlot->Icon->SetBrushFromTexture(Icon);
+		}
+		UISlot->Name->SetText(FText::FromString(Name));
 		UISlot->UpdateRecharge(RechargeTime / Cooldown);
 	}
 	else

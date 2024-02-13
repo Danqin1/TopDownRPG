@@ -22,4 +22,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float PushEnemiesStrength = 1000;
+
+	UPROPERTY()
+	ACharacter* Character;
 };

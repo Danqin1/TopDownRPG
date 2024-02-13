@@ -23,18 +23,18 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 {
 	if(Caster && SlashAnimation)
 	{
-		if(ATopDownRPGCharacter* Character = Cast<ATopDownRPGCharacter>(Caster))
+		if(ATopDownRPGCharacter* CasterCharacter = Cast<ATopDownRPGCharacter>(Caster))
 		{
-			Character->ModifyDamage(Damage);
+			CasterCharacter->ModifyDamage(Damage);
 			
 			FTimerHandle TimerHandle;
 			float AnimTime = SlashAnimation->GetSectionLength(0);
 		
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Character]()
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, CasterCharacter]()
 			{
 				if(Character)
 				{
-					Character->ClearDamageModifier();
+					CasterCharacter->ClearDamageModifier();
 				}
 			}, AnimTime, false, AnimTime);
 		}
