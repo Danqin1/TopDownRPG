@@ -71,18 +71,26 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 		}
 		else if(IIDamageable* Enemy = Cast<IIDamageable>(CurrentInteractionActor))
 		{
-			FVector Dir = CurrentInteractionActor->GetActorLocation() - GetCharacter()->GetActorLocation();
-			float Dot = FVector::DotProduct(Dir, GetCharacter()->GetActorForwardVector());
-			
-			if(FVector::Dist(CurrentInteractionActor->GetActorLocation(), GetCharacter()->GetActorLocation()) < CurrentInteractionMaxRange
-				&& Dot > .6)
+			if(Enemy->CanDamage())
 			{
-				SetAutoAttack(true);
+				FVector Dir = CurrentInteractionActor->GetActorLocation() - GetCharacter()->GetActorLocation();
+				float Dot = FVector::DotProduct(Dir, GetCharacter()->GetActorForwardVector());
+			
+				if(FVector::Dist(CurrentInteractionActor->GetActorLocation(), GetCharacter()->GetActorLocation()) < CurrentInteractionMaxRange
+					&& Dot > .6)
+				{
+					SetAutoAttack(true);
+				}
+				else
+				{
+					SetAutoAttack(false);
+					UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CurrentInteractionActor->GetActorLocation());
+				}
 			}
 			else
 			{
 				SetAutoAttack(false);
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CurrentInteractionActor->GetActorLocation());
+				CurrentInteractionActor = nullptr;
 			}
 		}
 	}
@@ -173,7 +181,11 @@ void ATopDownRPGPlayerController::OnSetDestinationReleased()
 	{
 		// We move there and spawn some particles
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		if(!CurrentInteractionActor)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator,
+			FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		}
 	}
 
 	FollowTime = 0.f;

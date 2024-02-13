@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 #include "EnemyCharacter.generated.h"
@@ -14,17 +15,28 @@ private:
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AEnemyCharacter();
+	
 	virtual void Damage(float Damage) override;
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void BeginPlay() override;
+	virtual bool CanDamage() override;
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Data")
+	FName EnemyDataName = "DefaultEnemy";
+	
+	UPROPERTY(EditDefaultsOnly, Category="Data")
+	UDataTable* Data;
+
+	UPROPERTY(EditDefaultsOnly)
+	UWidgetComponent* LifeBar;
+
+	float MaxHP = 0;
+	float CurrentHP = 0;
+	float CurrentDamage = 0;
+
+	bool bIsDead = false;
+
+	void Die();
 };

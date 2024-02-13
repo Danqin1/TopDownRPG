@@ -3,16 +3,38 @@
 
 #include "EnemyCharacter.h"
 
+#include "TopDownRPG/Database/FEnemyData.h"
+#include "TopDownRPG/UI/Enemy/EnemyLifebar.h"
+
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	LifeBar = CreateDefaultSubobject<UWidgetComponent>("Life Bar");
+	LifeBar->SetupAttachment(GetRootComponent());
+
+	if(GetMesh())
+	{
+		GetMesh()->SetCollisionProfileName("PhysicsActor");
+	}
 }
 
 void AEnemyCharacter::Damage(float Damage)
 {
+	CurrentHP = FMath::Max(0, CurrentHP - Damage);
+
+	if(UEnemyLifebar* HPBar = Cast<UEnemyLifebar>(LifeBar->GetWidget()))
+	{
+		HPBar->HPBar->SetPercent(CurrentHP / MaxHP);
+	}
+
+	if(CurrentHP <= 0 && !bIsDead)
+	{
+		Die();
+	}
 	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "Damaged by: "+ FString::SanitizeFloat(Damage));
 }
 
@@ -21,6 +43,28 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if(Data)
+	{
+		const FString ContextString(TEXT("Enemy data Context"));
+		FEnemyData* EnemyData = Data->FindRow<FEnemyData>(EnemyDataName, ContextString, true);
+		if(EnemyData)
+		GetMesh()->SetSkeletalMesh(EnemyData->SkeletalMesh);
+		GetMesh()->SetAnimInstanceClass(EnemyData->AnimBP);
+
+		MaxHP = EnemyData->MaxHP;
+		CurrentHP = MaxHP;
+		CurrentDamage = EnemyData->Damage;
+
+		if(UEnemyLifebar* HPBar = Cast<UEnemyLifebar>(LifeBar->GetWidget()))
+		{
+			HPBar->HPBar->SetPercent(CurrentHP / MaxHP);
+		}
+	}
+}
+
+bool AEnemyCharacter::CanDamage()
+{
+	return !bIsDead;
 }
 
 // Called every frame
@@ -33,5 +77,22 @@ void AEnemyCharacter::Tick(float DeltaTime)
 void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+void AEnemyCharacter::Die()
+{
+	bIsDead = true;
+	
+	GetMesh()->SetSimulatePhysics(true);
+	if(LifeBar)
+	{
+		LifeBar->SetVisibility(false);
+	}
+	FTimerHandle DisappearHandle;
+
+	GetWorldTimerManager().SetTimer(DisappearHandle, [this]()
+	{
+		Destroy();
+	},5,false, 5);
 }
 

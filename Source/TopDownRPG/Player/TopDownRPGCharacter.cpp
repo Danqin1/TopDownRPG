@@ -40,6 +40,7 @@ ATopDownRPGCharacter::ATopDownRPGCharacter()
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	CameraBoom->bEnableCameraLag = true;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -136,7 +137,8 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 						FVector Location = Enemy->GetActorLocation();
 						FVector LaunchDir = Location - GetActorLocation();
 						
-						Enemy->LaunchCharacter(LaunchDir * Settings->PushEnemiesStrength, false, false);
+						Enemy->LaunchCharacter(LaunchDir * Settings->PushEnemiesStrength * CurrentDamage / Settings->MeleeBaseDamage,
+							false, false);
 					}
 
 					if(DamageIndicator)

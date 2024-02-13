@@ -23,4 +23,5 @@ class TOPDOWNRPG_API IIDamageable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void Damage(float Damage) PURE_VIRTUAL();
+	virtual bool CanDamage() { return true; }
 };
