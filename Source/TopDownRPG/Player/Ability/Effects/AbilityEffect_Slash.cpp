@@ -32,15 +32,15 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 		
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, CasterCharacter]()
 			{
-				if(Character)
+				if(CasterCharacter)
 				{
 					CasterCharacter->ClearDamageModifier();
 				}
+				Destroy();
 			}, AnimTime, false, AnimTime);
 		}
 		
 		Caster->GetMovementComponent()->StopMovementImmediately();
 		Caster->PlayAnimMontage(SlashAnimation);
 	}
-	Super::Activate(Caster);
 }

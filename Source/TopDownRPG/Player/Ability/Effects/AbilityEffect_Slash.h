@@ -14,9 +14,6 @@ class TOPDOWNRPG_API AAbilityEffect_Slash : public AAbilityEffect
 public:
 	// Sets default values for this actor's properties
 	AAbilityEffect_Slash();
-
-	UPROPERTY(EditDefaultsOnly)
-	float Damage = 10;
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* SlashAnimation = nullptr;

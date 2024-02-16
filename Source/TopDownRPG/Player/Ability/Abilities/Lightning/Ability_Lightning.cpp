@@ -3,6 +3,8 @@
 
 #include "Ability_Lightning.h"
 
+#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+
 
 // Sets default values
 AAbility_Lightning::AAbility_Lightning()
@@ -15,7 +17,6 @@ AAbility_Lightning::AAbility_Lightning()
 void AAbility_Lightning::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -28,4 +29,3 @@ void AAbility_Lightning::Activate(ACharacter* Caster)
 {
 	Super::Activate(Caster);
 }
-

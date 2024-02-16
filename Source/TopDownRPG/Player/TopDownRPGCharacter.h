@@ -7,6 +7,7 @@
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "GameFramework/Character.h"
+#include "TopDownRPG/Interfaces/IDamageable.h"
 #include "TopDownRPG/UI/DamageIndicatorActor.h"
 #include "TopDownRPG/UI/HUD/PlayerHUD.h"
 #include "TopDownRPGCharacter.generated.h"
@@ -49,7 +50,7 @@ protected:
 	float lastSwordTrace = 0;
 
 	UPROPERTY()
-	TArray<AActor*> DamagedActors;
+	TArray<IIDamageable*> DamagedActors;
 
 	float CurrentDamage = 0;
 public:
@@ -73,5 +74,6 @@ public:
 	void EndSwordTrace();
 	void ModifyDamage(float NewDamage);
 	void ClearDamageModifier();
+	void TryDamageByAbility(const FVector Position, float Damage, const float Range = 10);
 };
 

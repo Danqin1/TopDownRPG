@@ -62,7 +62,7 @@ void ATopDownRPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(PlayerHUDClass)
+	if (PlayerHUDClass)
 	{
 		ATopDownRPGPlayerController* PC = GetController<ATopDownRPGPlayerController>();
 		check(PC);
@@ -71,16 +71,16 @@ void ATopDownRPGCharacter::BeginPlay()
 		PlayerHUD->AddToPlayerScreen();
 	}
 
-	TSet<UActorComponent*>  Components = GetComponents();
+	TSet<UActorComponent*> Components = GetComponents();
 	for (UActorComponent* Component : Components)
 	{
-		if(URPGActorComponentBase* RPGComponent = Cast<URPGActorComponentBase>(Component))
+		if (URPGActorComponentBase* RPGComponent = Cast<URPGActorComponentBase>(Component))
 		{
 			RPGComponent->SetupComponent();
 		}
 	}
 
-	if(Settings)
+	if (Settings)
 	{
 		CurrentDamage = Settings->MeleeBaseDamage;
 	}
@@ -92,15 +92,15 @@ void ATopDownRPGCharacter::BeginPlay()
 
 void ATopDownRPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if(PlayerHUD)
+	if (PlayerHUD)
 	{
 		PlayerHUD->RemoveFromParent();
 		PlayerHUD = nullptr;
 	}
-	TSet<UActorComponent*>  Components = GetComponents();
+	TSet<UActorComponent*> Components = GetComponents();
 	for (UActorComponent* Component : Components)
 	{
-		if(URPGActorComponentBase* RPGComponent = Cast<URPGActorComponentBase>(Component))
+		if (URPGActorComponentBase* RPGComponent = Cast<URPGActorComponentBase>(Component))
 		{
 			RPGComponent->Dispose();
 		}
@@ -110,48 +110,51 @@ void ATopDownRPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 {
-    Super::Tick(DeltaSeconds);
-	
-	if(bIsTracingSword)
+	Super::Tick(DeltaSeconds);
+
+	if (bIsTracingSword)
 	{
 		TArray<FHitResult> OutResults;
 		FVector Start = GetMesh()->GetSocketLocation("FX_weapon_base");
-		FVector End =  GetMesh()->GetSocketLocation("FX_weapon_tip");
+		FVector End = GetMesh()->GetSocketLocation("FX_weapon_tip");
 		TArray<AActor*> ToIgnore;
-		
-		UKismetSystemLibrary::SphereTraceMulti(GetWorld(),  Start, End , SwordTraceRadius,
-			TraceTypeQuery1,
-			false,
-			ToIgnore,
-			EDrawDebugTrace::ForDuration, OutResults, true, FLinearColor::Red, FLinearColor::Green, SwordTraceDelay);
+
+		UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Start, End, SwordTraceRadius,
+		                                       TraceTypeQuery1,
+		                                       false,
+		                                       ToIgnore,
+		                                       EDrawDebugTrace::ForDuration, OutResults, true, FLinearColor::Red,
+		                                       FLinearColor::Green, SwordTraceDelay);
 
 		for (FHitResult OutResult : OutResults)
 		{
-			if(!DamagedActors.Contains(OutResult.GetActor()))
+			if (auto* Damageable = Cast<IIDamageable>(OutResult.GetActor()))
 			{
-				if(auto* Damageable = Cast<IIDamageable>(OutResult.GetActor()))
+				if (!DamagedActors.Contains(Damageable))
 				{
 					Damageable->Damage(CurrentDamage);
-					if(auto* Enemy = Cast<AEnemyCharacter>(Damageable))
+					if (auto* Enemy = Cast<AEnemyCharacter>(Damageable))
 					{
 						FVector Location = Enemy->GetActorLocation();
 						FVector LaunchDir = Location - GetActorLocation();
-						
-						Enemy->LaunchCharacter(LaunchDir * Settings->PushEnemiesStrength * CurrentDamage / Settings->MeleeBaseDamage,
+
+						Enemy->LaunchCharacter(
+							LaunchDir * Settings->PushEnemiesStrength * CurrentDamage / Settings->MeleeBaseDamage,
 							false, false);
 					}
 
-					if(DamageIndicator)
+					if (DamageIndicator)
 					{
 						// self destroyed
-						ADamageIndicatorActor* Damage = GetWorld()->SpawnActor<ADamageIndicatorActor>(DamageIndicator, OutResult.Location, FRotator::ZeroRotator);
-						if(Damage)
+						ADamageIndicatorActor* Damage = GetWorld()->SpawnActor<ADamageIndicatorActor>(
+							DamageIndicator, OutResult.Location, FRotator::ZeroRotator);
+						if (Damage)
 						{
 							Damage->Show(CurrentDamage);
 						}
 					}
-					
-					DamagedActors.Add(OutResult.GetActor());
+
+					DamagedActors.Add(Damageable);
 				}
 			}
 		}
@@ -160,7 +163,7 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 
 void ATopDownRPGCharacter::SetAutoAttack(bool enabled)
 {
-	if(auto* AnimBP = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
+	if (auto* AnimBP = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
 	{
 		AnimBP->bIsAttacking = enabled;
 	}
@@ -185,4 +188,42 @@ void ATopDownRPGCharacter::ModifyDamage(float NewDamage)
 void ATopDownRPGCharacter::ClearDamageModifier()
 {
 	CurrentDamage = InventoryComponent->GetCurrentWeaponDamage();
+}
+
+void ATopDownRPGCharacter::TryDamageByAbility(const FVector Position, float Damage, const float Range)
+{
+	TArray<FHitResult> OutResults;
+	TArray<AActor*> ToIgnore;
+	DamagedActors.Empty();
+
+	UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Position, Position, Range,
+	                                       TraceTypeQuery1,
+	                                       false,
+	                                       ToIgnore,
+	                                       EDrawDebugTrace::None, OutResults, true, FLinearColor::Red,
+	                                       FLinearColor::Green, 2);
+
+	for (FHitResult OutResult : OutResults)
+	{
+		if (auto* Damageable = Cast<IIDamageable>(OutResult.GetActor()))
+		{
+			if (!DamagedActors.Contains(Damageable))
+			{
+				Damageable->Damage(Damage);
+				DamagedActors.Add(Damageable);
+				if (DamageIndicator)
+				{
+					// self destroyed
+					ADamageIndicatorActor* DamageIndicatorActor = GetWorld()->SpawnActor<ADamageIndicatorActor>(
+						DamageIndicator, OutResult.Location, FRotator::ZeroRotator);
+					if (DamageIndicatorActor)
+					{
+						DamageIndicatorActor->Show(Damage);
+					}
+				}
+			}
+		}
+	}
+
+	DamagedActors.Empty();
 }

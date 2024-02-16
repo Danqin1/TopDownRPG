@@ -5,6 +5,8 @@
 
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "TopDownRPG/Player/TopDownRPGCharacter.h"
 
 
 // Sets default values
@@ -32,7 +34,8 @@ void AAbilityEffect_Lightning::Tick(float DeltaTime)
 		{
 			if(OnPlayerEffect && Character)
 			{
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, OnTargetEffect,
+				Character->GetMovementComponent()->StopMovementImmediately();
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, OnPlayerEffect,
 					Character->GetActorLocation() + FVector::UpVector * OnPlayerEffectZOffset, FRotator::ZeroRotator,
 					FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 			}
@@ -47,6 +50,11 @@ void AAbilityEffect_Lightning::Tick(float DeltaTime)
 					FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 			}
 
+			if (auto* TDCharacter = Cast<ATopDownRPGCharacter>(Character))
+			{
+				TDCharacter->TryDamageByAbility(GetActorLocation(), Damage, DamageRange);
+			}
+			PrimaryActorTick.SetTickFunctionEnable(false);
 			Destroy();
 		}
 	}
@@ -55,6 +63,10 @@ void AAbilityEffect_Lightning::Tick(float DeltaTime)
 void AAbilityEffect_Lightning::Activate(ACharacter* Caster)
 {
 	Character = Caster;
+	if(CastAnimation)
+	{
+		Character->PlayAnimMontage(CastAnimation);
+	}
 	bIsActive = true;
 }
 

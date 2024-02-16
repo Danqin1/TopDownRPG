@@ -57,6 +57,10 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 			CurrentMouseCursor = EMouseCursor::Default;
 		}
 	}
+	else
+	{
+		Hit = EmptyHit;
+	}
 	
 	if(CurrentInteractionActor)
 	{
@@ -84,7 +88,7 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 				else
 				{
 					SetAutoAttack(false);
-					UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CurrentInteractionActor->GetActorLocation());
+					TryMoveTo(CurrentInteractionActor->GetActorLocation());
 				}
 			}
 			else
@@ -167,7 +171,7 @@ void ATopDownRPGPlayerController::OnSetDestinationTriggered()
 	
 	// Move towards mouse pointer or touch
 	APawn* ControlledPawn = GetPawn();
-	if (ControlledPawn != nullptr)
+	if (ControlledPawn != nullptr && !GetCharacter()->GetCurrentMontage())
 	{
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
@@ -180,7 +184,7 @@ void ATopDownRPGPlayerController::OnSetDestinationReleased()
 	if (FollowTime <= ShortPressThreshold)
 	{
 		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+		TryMoveTo(CachedDestination);
 		if(!CurrentInteractionActor)
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator,
@@ -219,6 +223,15 @@ void ATopDownRPGPlayerController::SetAutoAttack(bool enabled)
 	{
 		RPGPlayer->SetAutoAttack(enabled);
 	}
+}
+
+void ATopDownRPGPlayerController::TryMoveTo(FVector Position)
+{
+	if(GetCharacter()->GetCurrentMontage())
+	{
+		return;
+	}
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Position);
 }
 
 FHitResult ATopDownRPGPlayerController::GetLastMouseHit()

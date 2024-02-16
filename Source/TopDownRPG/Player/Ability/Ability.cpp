@@ -41,7 +41,8 @@ void AAbility::Activate(ACharacter* Caster)
 
 	for (auto Effect : Effects)
 	{
-		const FTransform Transform = TargetCharacter ? TargetCharacter->GetTransform() : Caster->GetTransform();
+		FTransform CastLocationTransform = FTransform(CastLocation);
+		const FTransform Transform = TargetCharacter ? TargetCharacter->GetTransform() : CastLocationTransform;
 		AAbilityEffect* AbilityEffect = GetWorld()->SpawnActor<AAbilityEffect>(Effect, Transform);
 
 		if (AbilityEffect)

@@ -140,6 +140,8 @@ void UAbilityComponent::TryUseAbility(AAbility* Ability)
 void UAbilityComponent::InitAbility(AAbility* Ability)
 {
 	CurrentCastingAbility = Ability;
+	CurrentCastingAbility->TargetCharacter = nullptr;
+	
 	if(CurrentCastingAbility)
 	{
 		switch (CurrentCastingAbility->CastType)
@@ -182,7 +184,7 @@ void UAbilityComponent::CastAbility()
 		CurrentCastingAbility->CastLocation = HitResult.Location;
 		CurrentCastingAbility->SetActorLocation(GetOwner()->GetActorLocation());
 		CurrentCastingAbility->Activate(PlayerController->GetCharacter());
-
+		
 		CurrentCastingAbility = nullptr;
 	}
 }

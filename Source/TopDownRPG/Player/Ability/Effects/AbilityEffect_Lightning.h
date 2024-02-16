@@ -18,6 +18,9 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	UAnimMontage* CastAnimation;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	UNiagaraSystem* OnPlayerEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
@@ -31,6 +34,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Effects")
 	float OnPlayerEffectZOffset = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category="Damage")
+	float DamageRange = 1;
 
 	bool bIsActive = false;
 	bool bFirstPlayed = false;

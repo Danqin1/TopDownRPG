@@ -62,6 +62,7 @@ protected:
 	bool bIsTouch; // Is it a touch device
 	float FollowTime; // For how long it has been pressed
 	FHitResult Hit;
+	FHitResult EmptyHit;
 
 	//Interaction
 	UPROPERTY()
@@ -82,6 +83,7 @@ protected:
 	void OnTouchReleased();
 	void OnZoomInOut(const FInputActionValue& Value);
 	void SetAutoAttack(bool enabled);
+	void TryMoveTo(FVector Position);
 };
 
 
