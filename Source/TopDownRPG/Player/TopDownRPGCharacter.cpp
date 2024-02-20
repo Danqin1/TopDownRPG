@@ -2,6 +2,7 @@
 
 #include "TopDownRPGCharacter.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "PlayerAnimInstance.h"
 #include "TopDownRPGPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
@@ -12,6 +13,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Enemy/EnemyCharacter.h"
@@ -137,10 +139,19 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 					{
 						FVector Location = Enemy->GetActorLocation();
 						FVector LaunchDir = Location - GetActorLocation();
+						FVector CutDir = OutResult.Location - End;
 
 						Enemy->LaunchCharacter(
 							LaunchDir * Settings->PushEnemiesStrength * CurrentDamage / Settings->MeleeBaseDamage,
 							false, false);
+
+						if(Settings->Blood_FX)
+						{
+							UNiagaraComponent* BloodFX = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,
+								Settings->Blood_FX, OutResult.Location, UKismetMathLibrary::FindLookAtRotation(End, OutResult.Location),
+								FVector(1.f, 1.f, 1.f), true, true,
+								ENCPoolMethod::None, true);
+						}
 					}
 
 					if (DamageIndicator)

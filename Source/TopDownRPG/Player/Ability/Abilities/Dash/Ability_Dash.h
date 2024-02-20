@@ -26,4 +26,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void Activate(ACharacter* Caster) override;
+	virtual bool CanUseAbility() override;
 };

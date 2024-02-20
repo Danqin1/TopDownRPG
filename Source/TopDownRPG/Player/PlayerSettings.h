@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraSystem.h"
 #include "Engine/DataAsset.h"
 #include "PlayerSettings.generated.h"
 
@@ -29,4 +30,7 @@ public:
 	float MeleeBaseDamage = 10;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float PushEnemiesStrength = 10;
+
+	UPROPERTY(EditAnywhere, Category = "VFX")
+	UNiagaraSystem* Blood_FX;
 };

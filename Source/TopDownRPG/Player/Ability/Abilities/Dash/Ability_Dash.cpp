@@ -39,3 +39,12 @@ void AAbility_Dash::Activate(ACharacter* Caster)
 	}
 }
 
+bool AAbility_Dash::CanUseAbility()
+{
+	if(CasterCharacter && CasterCharacter->GetCurrentMontage())
+	{
+		return false;
+	}
+	return Super::CanUseAbility();
+}
+
