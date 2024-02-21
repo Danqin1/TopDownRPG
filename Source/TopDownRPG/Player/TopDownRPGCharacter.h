@@ -7,6 +7,7 @@
 #include "Components/InventoryComponent.h"
 #include "Components/PlayerStatsComponent.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 #include "TopDownRPG/UI/DamageIndicatorActor.h"
 #include "TopDownRPG/UI/HUD/PlayerHUD.h"
@@ -45,6 +46,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Indication")
 	TSubclassOf<ADamageIndicatorActor> DamageIndicator;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UAIPerceptionStimuliSourceComponent* StimulusSourceComponent;
 
 	bool bIsTracingSword = false;
 	float lastSwordTrace = 0;

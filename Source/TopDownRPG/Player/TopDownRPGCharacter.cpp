@@ -15,6 +15,8 @@
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Perception/AISense_Hearing.h"
+#include "Perception/AISense_Sight.h"
 #include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Enemy/EnemyCharacter.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
@@ -58,6 +60,7 @@ ATopDownRPGCharacter::ATopDownRPGCharacter()
 	PlayerStatsComponent = CreateDefaultSubobject<UPlayerStatsComponent>(TEXT("Player Stats"));
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
+	StimulusSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus Source"));
 }
 
 void ATopDownRPGCharacter::BeginPlay()
@@ -90,6 +93,13 @@ void ATopDownRPGCharacter::BeginPlay()
 	{
 		DevDebug::OnScreenLog("Missing Player Settings!");
 	}
+
+	if(StimulusSourceComponent)
+	{
+		StimulusSourceComponent->RegisterForSense(TSubclassOf<UAISense_Sight>());
+		StimulusSourceComponent->RegisterForSense(TSubclassOf<UAISense_Hearing>());
+		StimulusSourceComponent->RegisterWithPerceptionSystem();
+	}
 }
 
 void ATopDownRPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -120,12 +130,15 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 		FVector Start = GetMesh()->GetSocketLocation("FX_weapon_base");
 		FVector End = GetMesh()->GetSocketLocation("FX_weapon_tip");
 		TArray<AActor*> ToIgnore;
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 
-		UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Start, End, SwordTraceRadius,
-		                                       TraceTypeQuery1,
+		UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, SwordTraceRadius,
+		                                       ObjectTypes,
 		                                       false,
 		                                       ToIgnore,
-		                                       EDrawDebugTrace::ForDuration, OutResults, true, FLinearColor::Red,
+		                                       EDrawDebugTrace::None, OutResults, true, FLinearColor::Red,
 		                                       FLinearColor::Green, SwordTraceDelay);
 
 		for (FHitResult OutResult : OutResults)
@@ -170,6 +183,11 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 			}
 		}
 	}
+
+	if(GetVelocity().Length() > 0.1)
+	{
+		UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1, this);
+	}
 }
 
 void ATopDownRPGCharacter::SetAutoAttack(bool enabled)
@@ -206,9 +224,12 @@ void ATopDownRPGCharacter::TryDamageByAbility(const FVector Position, float Dama
 	TArray<FHitResult> OutResults;
 	TArray<AActor*> ToIgnore;
 	DamagedActors.Empty();
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 
-	UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Position, Position, Range,
-	                                       TraceTypeQuery1,
+	UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Position, Position, Range,
+	                                       ObjectTypes,
 	                                       false,
 	                                       ToIgnore,
 	                                       EDrawDebugTrace::None, OutResults, true, FLinearColor::Red,

@@ -30,6 +30,8 @@ public:
 	float MeleeBaseDamage = 10;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float PushEnemiesStrength = 10;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float AutoTargetRange = 500;
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	UNiagaraSystem* Blood_FX;

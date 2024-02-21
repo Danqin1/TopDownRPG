@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/DataTable.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "FEnemyData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -22,4 +23,16 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="Combat")
 	float MoveSpeed = 500;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	float ViewRange = 1000;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	float HearRange = 1000;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	float FieldOfView = 90;
+
+	UPROPERTY(EditAnywhere, Category="AI")
+	UBehaviorTree* MainBehaviourTree;
 };

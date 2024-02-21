@@ -84,6 +84,7 @@ protected:
 	void OnZoomInOut(const FInputActionValue& Value);
 	void SetAutoAttack(bool enabled);
 	void TryMoveTo(FVector Position);
+	bool TryTargetNextCloseEnemy();
 };
 
 

@@ -10,6 +10,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "TopDownRPG/DevDebug.h"
+#include "TopDownRPG/Enemy/Enemy.h"
+#include "TopDownRPG/Enemy/EnemyCharacter.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 #include "TopDownRPG/Interfaces/Interactable.h"
 
@@ -40,7 +44,7 @@ void ATopDownRPGPlayerController::BeginPlay()
 
 void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 {
-	bool bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
+	bool bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, true, Hit);
 
 	if(bHitSuccessful)
 	{
@@ -91,7 +95,7 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 					TryMoveTo(CurrentInteractionActor->GetActorLocation());
 				}
 			}
-			else
+			else if(!TryTargetNextCloseEnemy())
 			{
 				SetAutoAttack(false);
 				CurrentInteractionActor = nullptr;
@@ -232,6 +236,41 @@ void ATopDownRPGPlayerController::TryMoveTo(FVector Position)
 		return;
 	}
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, Position);
+}
+
+bool ATopDownRPGPlayerController::TryTargetNextCloseEnemy()
+{
+	TArray<FHitResult> OutResults;
+	FVector Start = GetCharacter()->GetActorLocation();
+	FVector End = Start;
+	TArray<AActor*> ToIgnore;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	bool bHitted = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, Settings->AutoTargetRange,
+										   ObjectTypes,
+										   false,
+										   ToIgnore,
+										   EDrawDebugTrace::None, OutResults, true, FLinearColor::Red,
+										   FLinearColor::Green, 4);
+
+	if(bHitted)
+	{
+		for (FHitResult OutResult : OutResults)
+		{
+			if(auto* Enemy = Cast<IIDamageable>(OutResult.GetActor()))
+			{
+				if(Enemy->CanDamage())
+				{
+					CurrentInteractionActor = OutResult.GetActor();
+					CurrentInteractionMaxRange = Settings->MeleeAttackRange;
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 FHitResult ATopDownRPGPlayerController::GetLastMouseHit()

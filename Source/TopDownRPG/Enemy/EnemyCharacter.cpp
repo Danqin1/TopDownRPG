@@ -3,6 +3,9 @@
 
 #include "EnemyCharacter.h"
 
+#include "AI/EnemyAIController.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "TopDownRPG/Database/FEnemyData.h"
 #include "TopDownRPG/UI/Enemy/EnemyLifebar.h"
 
@@ -18,8 +21,10 @@ AEnemyCharacter::AEnemyCharacter()
 
 	if(GetMesh())
 	{
-		GetMesh()->SetCollisionProfileName("PhysicsActor");
+		GetMesh()->SetCollisionProfileName("CharacterMesh");
 	}
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 void AEnemyCharacter::Damage(float Damage)
@@ -48,13 +53,21 @@ void AEnemyCharacter::BeginPlay()
 		const FString ContextString(TEXT("Enemy data Context"));
 		FEnemyData* EnemyData = Data->FindRow<FEnemyData>(EnemyDataName, ContextString, true);
 		if(EnemyData)
-		GetMesh()->SetSkeletalMesh(EnemyData->SkeletalMesh);
-		GetMesh()->SetAnimInstanceClass(EnemyData->AnimBP);
+		{
+			GetMesh()->SetSkeletalMesh(EnemyData->SkeletalMesh);
+			GetMesh()->SetAnimInstanceClass(EnemyData->AnimBP);
 
-		MaxHP = EnemyData->MaxHP;
-		CurrentHP = MaxHP;
-		CurrentDamage = EnemyData->Damage;
+			MaxHP = EnemyData->MaxHP;
+			CurrentHP = MaxHP;
+			CurrentDamage = EnemyData->Damage;
+			if(AEnemyAIController* EnemyAIController = Cast<AEnemyAIController>(GetController()))
+			{
+				EnemyAIController->SetAIData(EnemyData);
+			}
 
+			GetCharacterMovement()->MaxWalkSpeed = EnemyData->MoveSpeed;
+		}
+		
 		if(UEnemyLifebar* HPBar = Cast<UEnemyLifebar>(LifeBar->GetWidget()))
 		{
 			HPBar->HPBar->SetPercent(CurrentHP / MaxHP);
@@ -82,8 +95,11 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AEnemyCharacter::Die()
 {
 	bIsDead = true;
-	
+
+	GetMesh()->SetCollisionProfileName("Ragdoll");
 	GetMesh()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	if(LifeBar)
 	{
 		LifeBar->SetVisibility(false);
