@@ -106,6 +106,21 @@ void ATopDownRPGPlayerController::Tick(float DeltaSeconds)
 	{
 		SetAutoAttack(false);
 	}
+
+	if(TimeToHideWeapon > 0 )
+	{
+		TimeToHideWeapon -= DeltaSeconds;
+		if(TimeToHideWeapon <= 0)
+		{
+			if(ATopDownRPGCharacter* RPGPlayer = Cast<ATopDownRPGCharacter>(GetCharacter()))
+			{
+				if(UInventoryComponent* InventoryComponent = RPGPlayer->FindComponentByClass<UInventoryComponent>())
+				{
+					InventoryComponent->TryHideWeapon();
+				}
+			}
+		}
+	}
 	Super::Tick(DeltaSeconds);
 }
 
@@ -223,9 +238,25 @@ void ATopDownRPGPlayerController::OnZoomInOut(const FInputActionValue& Value)
 
 void ATopDownRPGPlayerController::SetAutoAttack(bool enabled)
 {
+	if(bAutoAttackEnabled == enabled) return;
+	
 	if(ATopDownRPGCharacter* RPGPlayer = Cast<ATopDownRPGCharacter>(GetCharacter()))
 	{
+		if(enabled)
+		{
+			TimeToHideWeapon = 0;
+			if(UInventoryComponent* InventoryComponent = RPGPlayer->FindComponentByClass<UInventoryComponent>())
+			{
+				InventoryComponent->TryGetWeapon();
+			}
+		}
+		else
+		{
+			TimeToHideWeapon = Settings->TimeToHideWeapon;
+		}
+		
 		RPGPlayer->SetAutoAttack(enabled);
+		bAutoAttackEnabled = enabled;
 	}
 }
 

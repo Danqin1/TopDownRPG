@@ -127,8 +127,8 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 	if (bIsTracingSword)
 	{
 		TArray<FHitResult> OutResults;
-		FVector Start = GetMesh()->GetSocketLocation("FX_weapon_base");
-		FVector End = GetMesh()->GetSocketLocation("FX_weapon_tip");
+		FVector Start = GetMesh()->GetSocketLocation("weapon_base");
+		FVector End = GetMesh()->GetSocketLocation("weapon_tip");
 		TArray<AActor*> ToIgnore;
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
@@ -192,10 +192,7 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 
 void ATopDownRPGCharacter::SetAutoAttack(bool enabled)
 {
-	if (auto* AnimBP = Cast<UPlayerAnimInstance>(GetMesh()->GetAnimInstance()))
-	{
-		AnimBP->bIsAttacking = enabled;
-	}
+	bIsAttacking = enabled;
 }
 
 void ATopDownRPGCharacter::StartSwordTrace()

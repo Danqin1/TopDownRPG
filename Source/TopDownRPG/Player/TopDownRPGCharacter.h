@@ -73,6 +73,8 @@ public:
 	UPROPERTY()
 	UPlayerHUD* PlayerHUD;
 
+	bool bIsAttacking = false;
+
 	void SetAutoAttack(bool enabled);
 	void StartSwordTrace();
 	void EndSwordTrace();
