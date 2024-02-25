@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 
 
 // Sets default values
@@ -50,7 +50,7 @@ void AAbilityEffect_Lightning::Tick(float DeltaTime)
 					FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 			}
 
-			if (auto* TDCharacter = Cast<ATopDownRPGCharacter>(Character))
+			if (auto* TDCharacter = Cast<ARPGCharacter>(Character))
 			{
 				TDCharacter->TryDamageByAbility(GetActorLocation(), Damage, DamageRange);
 			}

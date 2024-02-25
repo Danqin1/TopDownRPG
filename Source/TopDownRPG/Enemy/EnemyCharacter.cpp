@@ -27,6 +27,11 @@ AEnemyCharacter::AEnemyCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
+void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity)
+{
+	LaunchCharacter(HitVelocity, false, false);
+}
+
 void AEnemyCharacter::Damage(float Damage)
 {
 	CurrentHP = FMath::Max(0, CurrentHP - Damage);
@@ -40,7 +45,6 @@ void AEnemyCharacter::Damage(float Damage)
 	{
 		Die();
 	}
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "Damaged by: "+ FString::SanitizeFloat(Damage));
 }
 
 // Called when the game starts or when spawned

@@ -3,15 +3,23 @@
 
 #include "CombatComponent.h"
 
+#include "EnhancedInputComponent.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
+
 
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+}
 
-	// ...
+void UCombatComponent::SetupComponent()
+{
+}
+
+void UCombatComponent::Dispose()
+{
 }
 
 
@@ -21,7 +29,47 @@ void UCombatComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
+	{
+		Input->BindAction(AttackAction, ETriggerEvent::Started, this, &UCombatComponent::OnAttack);
+		Input->BindAction(DodgeAction, ETriggerEvent::Started, this, &UCombatComponent::OnDodge);
+	}
+}
+
+void UCombatComponent::OnAttack()
+{
+	if(!bIsAttacking)
+	{
+		if(ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
+		{
+			if(RPGPlayer->InventoryComponent->HasEquippedWeapon())
+			{
+				currentComboIndex = 0;
+				lastAttackInputTime = RPGPlayer->PlayAnimMontage(NormalAttackComboAnimations[currentComboIndex]) / NormalAttackComboAnimations[currentComboIndex]->RateScale;
+				bIsAttacking = true;
+				bShouldContinueCombo = false;
+			}
+		}
+	}
+	else
+	{
+		bShouldContinueCombo = true;
+	}
+}
+
+void UCombatComponent::OnDodge()
+{
+	if(DodgeAnim)
+	{
+		if(ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
+		{
+			RPGPlayer->StopAnimMontage();
+			RPGPlayer->PlayAnimMontage(DodgeAnim);
+			currentComboIndex = 0;
+			bIsAttacking = false;
+			lastAttackInputTime = 0;
+		}
+	}
 }
 
 
@@ -29,8 +77,32 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                      FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+}
 
-	// ...
+void UCombatComponent::TryContinueCombo()
+{
+	if(bIsAttacking)
+	{
+			if(bShouldContinueCombo)
+			{
+				if(ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
+				{
+					if(RPGPlayer->InventoryComponent->HasEquippedWeapon())
+					{
+						if(++currentComboIndex >= NormalAttackComboAnimations.Num() || currentComboIndex >= ComboLock)
+						{
+							currentComboIndex = 0;
+						}
+						lastAttackInputTime = RPGPlayer->PlayAnimMontage(NormalAttackComboAnimations[currentComboIndex]) / NormalAttackComboAnimations[currentComboIndex]->RateScale;
+						bShouldContinueCombo = false;
+					}
+				}
+			}
+			else
+			{
+				bIsAttacking = false;
+			}
+	}
 }
 

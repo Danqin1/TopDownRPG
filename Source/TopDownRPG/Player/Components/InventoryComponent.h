@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "InputAction.h"
 #include "Components/ActorComponent.h"
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -25,13 +27,13 @@ protected:
 	UStaticMeshComponent* WeaponMeleeBackIdle; // for tests
 
 	UPROPERTY(EditDefaultsOnly, Category="Weapon")
+	UInputAction* EquipAction;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Weapon")
 	UAnimMontage* GetWeaponAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category="Weapon")
 	UAnimMontage* HideWeaponAnim;
-
-	UPROPERTY(EditDefaultsOnly, Category="Weapon")
-	UInputAction* WeaponToggleInputAction;
 
 	bool bEquippedWeapon = false;
 	// Called when the game starts
@@ -46,9 +48,6 @@ public:
 	
 	UFUNCTION()
 	void ToggleMelee();
-
-	void TryGetWeapon();
-	void TryHideWeapon();
 
 	inline bool HasEquippedWeapon() { return bEquippedWeapon; }
 };

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TopDownRPG/Items/ItemBase.h"
 #include "TopDownRPG/Interfaces/Interactable.h"
-#include "TopDownRPG/Player/TopDownRPGPlayerController.h"
+#include "TopDownRPG/Player/RPGPlayerController.h"
 #include "InteractableBase.generated.h"
 
 UCLASS()
@@ -31,7 +31,7 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	ATopDownRPGPlayerController* GetPlayerController();
+	ARPGPlayerController* GetPlayerController();
 
 	UFUNCTION()
 	virtual void CustomOnEndMouseOver(UPrimitiveComponent* TouchedComponent);
@@ -39,5 +39,5 @@ protected:
 	virtual void CustomOnBeginMouseOver(UPrimitiveComponent* TouchedComponent);
 public:
 	virtual void OnClicked() override;
-	virtual void Interact(ATopDownRPGCharacter* Character) override;
+	virtual void Interact(ARPGCharacter* Character) override;
 };

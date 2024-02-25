@@ -3,7 +3,7 @@
 
 #include "PlayerStatsComponent.h"
 
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 
 
 // Sets default values for this component's properties
@@ -27,7 +27,7 @@ void UPlayerStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UPlayerStatsComponent::SetupComponent()
 {
-	if(ATopDownRPGCharacter* Player = Cast<ATopDownRPGCharacter>(GetOwner()))
+	if(ARPGCharacter* Player = Cast<ARPGCharacter>(GetOwner()))
 	{
 		PlayerHUD = Player->PlayerHUD;
 		check(PlayerHUD);
@@ -41,7 +41,7 @@ void UPlayerStatsComponent::SetupComponent()
 
 void UPlayerStatsComponent::Dispose()
 {
-	if(ATopDownRPGCharacter* Player = Cast<ATopDownRPGCharacter>(GetOwner()))
+	if(ARPGCharacter* Player = Cast<ARPGCharacter>(GetOwner()))
 	{
 		Player->OnTakeAnyDamage.RemoveDynamic(this, &UPlayerStatsComponent::OnTakeDamage);
 	}

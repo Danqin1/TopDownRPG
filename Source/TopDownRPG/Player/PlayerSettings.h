@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AutoTargetRange = 500;
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float TimeToHideWeapon = 2;
+	float AutoPickUpWeaponRange = 800;
 
 	UPROPERTY(EditAnywhere, Category = "VFX")
 	UNiagaraSystem* Blood_FX;

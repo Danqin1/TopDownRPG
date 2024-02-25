@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
@@ -24,5 +24,5 @@ class TOPDOWNRPG_API IInteractable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void OnClicked() PURE_VIRTUAL()
-	virtual void Interact(ATopDownRPGCharacter* Character) PURE_VIRTUAL()
+	virtual void Interact(ARPGCharacter* Character) PURE_VIRTUAL()
 };

@@ -24,5 +24,5 @@ class TOPDOWNRPG_API IEnemy
 protected:
 public:
 	UFUNCTION()
-	virtual void OnHit() PURE_VIRTUAL()
+	virtual void OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity) PURE_VIRTUAL()
 };

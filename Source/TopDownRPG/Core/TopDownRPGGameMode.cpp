@@ -1,14 +1,14 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TopDownRPGGameMode.h"
-#include "TopDownRPG//Player/TopDownRPGPlayerController.h"
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+#include "TopDownRPG//Player/RPGPlayerController.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ATopDownRPGGameMode::ATopDownRPGGameMode()
 {
 	// use our custom PlayerController class
-	PlayerControllerClass = ATopDownRPGPlayerController::StaticClass();
+	PlayerControllerClass = ARPGPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprints/BP_TopDownCharacter"));

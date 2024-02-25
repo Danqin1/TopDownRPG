@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TopDownRPGCharacter.h"
+#include "RPGCharacter.h"
 #include "Animation/AnimInstance.h"
 #include "PlayerAnimInstance.generated.h"
 
@@ -16,9 +16,11 @@ class TOPDOWNRPG_API UPlayerAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 	UPROPERTY()
-	ATopDownRPGCharacter* Character = nullptr;
+	ARPGCharacter* Character = nullptr;
 	UPROPERTY()
 	UInventoryComponent* InventoryComponent = nullptr;
+	UPROPERTY()
+	UCharacterMovementComponent* MovementComponent = nullptr;
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool bIsAttacking = false;
@@ -27,7 +29,16 @@ public:
 	bool bHasSword = true;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool bIsAccelerating = false;
+	bool bShouldMove = false;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float GroundSpeed = 0;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bIsFalling = false;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FVector Velocity = FVector::Zero();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AccelerationThreshold = 50;

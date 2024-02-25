@@ -3,11 +3,11 @@
 
 #include "AN_SwordTrace.h"
 
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 
 void UAN_SwordTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
-	if(auto* Player = Cast<ATopDownRPGCharacter>(MeshComp->GetOwner()))
+	if(auto* Player = Cast<ARPGCharacter>(MeshComp->GetOwner()))
 	{
 		Player->StartSwordTrace();
 	}
@@ -15,7 +15,7 @@ void UAN_SwordTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequence
 
 void UAN_SwordTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	if(auto* Player = Cast<ATopDownRPGCharacter>(MeshComp->GetOwner()))
+	if(auto* Player = Cast<ARPGCharacter>(MeshComp->GetOwner()))
 	{
 		Player->EndSwordTrace();
 	}

@@ -1,27 +1,26 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "TopDownRPGCharacter.h"
+#include "RPGCharacter.h"
 
 #include "NiagaraFunctionLibrary.h"
-#include "PlayerAnimInstance.h"
-#include "TopDownRPGPlayerController.h"
-#include "UObject/ConstructorHelpers.h"
+#include "RPGPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Perception/AISense_Hearing.h"
 #include "Perception/AISense_Sight.h"
 #include "TopDownRPG/DevDebug.h"
-#include "TopDownRPG/Enemy/EnemyCharacter.h"
+#include "TopDownRPG/Interfaces/Enemy.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 
-ATopDownRPGCharacter::ATopDownRPGCharacter()
+ARPGCharacter::ARPGCharacter()
 {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -30,26 +29,26 @@ ATopDownRPGCharacter::ATopDownRPGCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-
-	// Configure character movement
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 
-	// Create a camera boom...
+	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->AirControl = 0.35f;
+	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-	CameraBoom->bEnableCameraLag = true;
+	CameraBoom->TargetArmLength = 400.0f;
+	CameraBoom->bUsePawnControlRotation = true;
 
-	// Create a camera...
-	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	// Create a follow camera
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -60,16 +59,17 @@ ATopDownRPGCharacter::ATopDownRPGCharacter()
 	PlayerStatsComponent = CreateDefaultSubobject<UPlayerStatsComponent>(TEXT("Player Stats"));
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat Component"));
 	StimulusSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus Source"));
 }
 
-void ATopDownRPGCharacter::BeginPlay()
+void ARPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (PlayerHUDClass)
 	{
-		ATopDownRPGPlayerController* PC = GetController<ATopDownRPGPlayerController>();
+		ARPGPlayerController* PC = GetController<ARPGPlayerController>();
 		check(PC);
 		PlayerHUD = CreateWidget<UPlayerHUD>(PC, PlayerHUDClass);
 		check(PlayerHUD);
@@ -102,7 +102,7 @@ void ATopDownRPGCharacter::BeginPlay()
 	}
 }
 
-void ATopDownRPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ARPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (PlayerHUD)
 	{
@@ -117,10 +117,11 @@ void ATopDownRPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			RPGComponent->Dispose();
 		}
 	}
+
 	Super::EndPlay(EndPlayReason);
 }
 
-void ATopDownRPGCharacter::Tick(float DeltaSeconds)
+void ARPGCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -148,15 +149,13 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 				if (!DamagedActors.Contains(Damageable))
 				{
 					Damageable->Damage(CurrentDamage);
-					if (auto* Enemy = Cast<AEnemyCharacter>(Damageable))
+					if (auto* Enemy = Cast<IEnemy>(Damageable))
 					{
-						FVector Location = Enemy->GetActorLocation();
+						FVector Location = OutResult.GetActor()->GetActorLocation();
 						FVector LaunchDir = Location - GetActorLocation();
-						FVector CutDir = OutResult.Location - End;
 
-						Enemy->LaunchCharacter(
-							LaunchDir * Settings->PushEnemiesStrength * CurrentDamage / Settings->MeleeBaseDamage,
-							false, false);
+						Enemy->OnHit(this, OutResult.Location,
+							LaunchDir * Settings->PushEnemiesStrength * CurrentDamage / Settings->MeleeBaseDamage);
 
 						if(Settings->Blood_FX)
 						{
@@ -190,33 +189,28 @@ void ATopDownRPGCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-void ATopDownRPGCharacter::SetAutoAttack(bool enabled)
-{
-	bIsAttacking = enabled;
-}
-
-void ATopDownRPGCharacter::StartSwordTrace()
+void ARPGCharacter::StartSwordTrace()
 {
 	DamagedActors.Empty();
 	bIsTracingSword = true;
 }
 
-void ATopDownRPGCharacter::EndSwordTrace()
+void ARPGCharacter::EndSwordTrace()
 {
 	bIsTracingSword = false;
 }
 
-void ATopDownRPGCharacter::ModifyDamage(float NewDamage)
+void ARPGCharacter::ModifyDamage(float NewDamage)
 {
 	CurrentDamage = NewDamage;
 }
 
-void ATopDownRPGCharacter::ClearDamageModifier()
+void ARPGCharacter::ClearDamageModifier()
 {
 	CurrentDamage = InventoryComponent->GetCurrentWeaponDamage();
 }
 
-void ATopDownRPGCharacter::TryDamageByAbility(const FVector Position, float Damage, const float Range)
+void ARPGCharacter::TryDamageByAbility(const FVector Position, float Damage, const float Range)
 {
 	TArray<FHitResult> OutResults;
 	TArray<AActor*> ToIgnore;

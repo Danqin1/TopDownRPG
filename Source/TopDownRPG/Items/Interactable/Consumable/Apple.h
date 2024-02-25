@@ -16,7 +16,7 @@ public:
 	AApple();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	virtual void Interact(ATopDownRPGCharacter* Character) override;
+	virtual void Interact(ARPGCharacter* Character) override;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Consumable")
 	float HPValue = 5;

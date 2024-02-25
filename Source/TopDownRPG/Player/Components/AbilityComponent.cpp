@@ -7,8 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TopDownRPG/DevDebug.h"
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
-#include "TopDownRPG/Player/TopDownRPGPlayerController.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
+#include "TopDownRPG/Player/RPGPlayerController.h"
 
 
 // Sets default values for this component's properties
@@ -22,12 +22,12 @@ UAbilityComponent::UAbilityComponent()
 
 void UAbilityComponent::SetupComponent()
 {
-	if(ATopDownRPGPlayerController* CharacterPC = Cast<ATopDownRPGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+	if(ARPGPlayerController* CharacterPC = Cast<ARPGPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
 	{
 		PlayerController = CharacterPC;
 	}
 
-	if(ATopDownRPGCharacter* Player = Cast<ATopDownRPGCharacter>(GetOwner()))
+	if(ARPGCharacter* Player = Cast<ARPGCharacter>(GetOwner()))
 	{
 		PlayerHUD = Player->PlayerHUD;
 		check(PlayerHUD);
@@ -49,7 +49,7 @@ void UAbilityComponent::Dispose()
 void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
 {
-	if(CurrentCastingIndicator && CurrentCastingAbility)
+	/*if(CurrentCastingIndicator && CurrentCastingAbility)
 	{
 		if(PlayerController)
 		{
@@ -69,14 +69,14 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				break;
 			}
 		}
-	}
+	}*/
 }
 
 void UAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
+	/*if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
 	{
 		Input->BindAction(Ability1Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility1);
 		Input->BindAction(Ability2Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility2);
@@ -91,7 +91,7 @@ void UAbilityComponent::BeginPlay()
 		Input->BindAction(Ability4Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
 		Input->BindAction(Ability5Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
 		Input->BindAction(Ability6Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-	}
+	}*/
 }
 
 void UAbilityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -174,14 +174,14 @@ void UAbilityComponent::CastAbility()
 	
 	if(PlayerController)
 	{
-		FHitResult HitResult = PlayerController->GetLastMouseHit();
+		//FHitResult HitResult = PlayerController->GetLastMouseHit();
 		
-		if(ACharacter* Character =  Cast<ACharacter>(HitResult.GetActor()))
+		/*if(ACharacter* Character =  Cast<ACharacter>(HitResult.GetActor()))
 		{
 			CurrentCastingAbility->TargetCharacter = Character;
-		}
+		}*/
 		
-		CurrentCastingAbility->CastLocation = HitResult.Location;
+		CurrentCastingAbility->CastLocation = GetOwner()->GetActorLocation();//HitResult.Location;
 		CurrentCastingAbility->SetActorLocation(GetOwner()->GetActorLocation());
 		CurrentCastingAbility->Activate(PlayerController->GetCharacter());
 		

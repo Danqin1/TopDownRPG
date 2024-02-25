@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputAction.h"
 #include "RPGActorComponentBase.h"
 #include "CombatComponent.generated.h"
 
@@ -16,12 +17,42 @@ public:
 	// Sets default values for this component's properties
 	UCombatComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	virtual void SetupComponent() override;
+	virtual void Dispose() override;
 
-public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+	void TryContinueCombo();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* AttackAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	UInputAction* DodgeAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	TArray<UAnimMontage*> NormalAttackComboAnimations;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	UAnimMontage* DodgeAnim;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	int ComboLock = 2;
+
+	float lastAttackInputTime = 0;
+	bool bIsAttacking = false;
+	int currentComboIndex = 0;
+	bool bShouldContinueCombo = false;
+
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnAttack();
+
+	UFUNCTION()
+	void OnDodge();
 };

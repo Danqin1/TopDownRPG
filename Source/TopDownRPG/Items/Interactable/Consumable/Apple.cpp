@@ -3,7 +3,7 @@
 
 #include "Apple.h"
 
-#include "TopDownRPG/Player/TopDownRPGPlayerController.h"
+#include "TopDownRPG/Player/RPGPlayerController.h"
 
 
 // Sets default values
@@ -28,7 +28,7 @@ void AApple::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void AApple::Interact(ATopDownRPGCharacter* Character)
+void AApple::Interact(ARPGCharacter* Character)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "Interaction");
 	UPlayerStatsComponent* PlayerStatsComponent = Character->GetComponentByClass<UPlayerStatsComponent>();

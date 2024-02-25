@@ -20,9 +20,9 @@ void AInteractableBase::BeginPlay()
 	
 }
 
-ATopDownRPGPlayerController* AInteractableBase::GetPlayerController()
+ARPGPlayerController* AInteractableBase::GetPlayerController()
 {
-	if(ATopDownRPGPlayerController* PC = Cast<ATopDownRPGPlayerController>(GetWorld()->GetFirstPlayerController()))
+	if(ARPGPlayerController* PC = Cast<ARPGPlayerController>(GetWorld()->GetFirstPlayerController()))
 	{
 		return PC;
 	}
@@ -47,14 +47,14 @@ void AInteractableBase::CustomOnBeginMouseOver(UPrimitiveComponent* TouchedCompo
 
 void AInteractableBase::OnClicked()
 {
-	ATopDownRPGPlayerController* PC = GetPlayerController();
-	if(PC)
+	ARPGPlayerController* PC = GetPlayerController();
+	/*if(PC)
 	{
 		PC->SetInteractWith(this, MaxInteractionRange);
-	}
+	}*/
 }
 
-void AInteractableBase::Interact(ATopDownRPGCharacter* Character)
+void AInteractableBase::Interact(ARPGCharacter* Character)
 {
 	
 }

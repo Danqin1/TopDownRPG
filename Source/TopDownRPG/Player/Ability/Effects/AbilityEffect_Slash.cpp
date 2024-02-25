@@ -3,7 +3,7 @@
 
 #include "AbilityEffect_Slash.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "TopDownRPG/Player/TopDownRPGCharacter.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 
 
 // Sets default values
@@ -23,7 +23,7 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 {
 	if(Caster && SlashAnimation)
 	{
-		if(ATopDownRPGCharacter* CasterCharacter = Cast<ATopDownRPGCharacter>(Caster))
+		if(ARPGCharacter* CasterCharacter = Cast<ARPGCharacter>(Caster))
 		{
 			CasterCharacter->ModifyDamage(Damage);
 			

@@ -3,6 +3,7 @@
 
 #include "InventoryComponent.h"
 
+#include "ComponentUtils.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
 
@@ -36,7 +37,7 @@ void UInventoryComponent::BeginPlay()
 
 	if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
 	{
-		Input->BindAction(WeaponToggleInputAction, ETriggerEvent::Started, this, &UInventoryComponent::ToggleMelee);
+		Input->BindAction(EquipAction, ETriggerEvent::Started, this, &UInventoryComponent::ToggleMelee);
 	}
 }
 
@@ -80,22 +81,6 @@ void UInventoryComponent::ToggleMelee()
 			WeaponMeleeHandle->SetStaticMesh(nullptr);
 		}
 		bEquippedWeapon = !bEquippedWeapon;
-	}
-}
-
-void UInventoryComponent::TryGetWeapon()
-{
-	if(!bEquippedWeapon)
-	{
-		ToggleMelee();
-	}
-}
-
-void UInventoryComponent::TryHideWeapon()
-{
-	if(bEquippedWeapon)
-	{
-		ToggleMelee();
 	}
 }
 

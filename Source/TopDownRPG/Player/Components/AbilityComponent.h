@@ -6,7 +6,7 @@
 #include "InputAction.h"
 #include "RPGActorComponentBase.h"
 #include "Components/ActorComponent.h"
-#include "TopDownRPG/Player/TopDownRPGPlayerController.h"
+#include "TopDownRPG/Player/RPGPlayerController.h"
 #include "TopDownRPG/Player/Ability/Ability.h"
 #include "TopDownRPG/Player/Ability/Casting/DirectionCaster.h"
 #include "TopDownRPG/Player/Ability/Casting/TargetCaster.h"
@@ -63,7 +63,7 @@ protected:
 	UPROPERTY()
 	ACaster* CurrentCastingIndicator;
 	UPROPERTY()
-	ATopDownRPGPlayerController* PlayerController;
+	ARPGPlayerController* PlayerController;
 	UPROPERTY(Transient)
 	UPlayerHUD* PlayerHUD = nullptr;
 	UPROPERTY()
