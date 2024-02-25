@@ -6,6 +6,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTopDownRPG, Log, All);
 
+DECLARE_MULTICAST_DELEGATE(FOnDieEvent);
+
 UENUM(BlueprintType)
 enum CastType
 {

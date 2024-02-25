@@ -5,17 +5,16 @@
 #include "CoreMinimal.h"
 #include "RPGActorComponentBase.h"
 #include "Components/ActorComponent.h"
+#include "TopDownRPG/TopDownRPG.h"
 #include "TopDownRPG/UI/HUD/PlayerHUD.h"
 #include "PlayerStatsComponent.generated.h"
-
-DECLARE_MULTICAST_DELEGATE(FDieEvent)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TOPDOWNRPG_API UPlayerStatsComponent : public URPGActorComponentBase
 {
 	GENERATED_BODY()
 public:
-	FDieEvent OnDied;
+	FOnDieEvent OnDied;
 	
 	// Sets default values for this component's properties
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);

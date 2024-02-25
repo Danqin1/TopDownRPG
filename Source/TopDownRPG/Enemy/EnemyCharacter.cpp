@@ -99,7 +99,11 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AEnemyCharacter::Die()
 {
 	bIsDead = true;
-
+	if(OnDie.IsBound())
+	{
+		OnDie.Broadcast();
+	}
+	
 	GetMesh()->SetCollisionProfileName("Ragdoll");
 	GetMesh()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

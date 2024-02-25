@@ -17,7 +17,7 @@ private:
 
 public:
 	AEnemyCharacter();
-
+	
 	virtual void OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity) override;
 	virtual void Damage(float Damage) override;
 	virtual void Tick(float DeltaTime) override;

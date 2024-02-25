@@ -52,7 +52,7 @@ void AAbilityEffect_Lightning::Tick(float DeltaTime)
 
 			if (auto* TDCharacter = Cast<ARPGCharacter>(Character))
 			{
-				TDCharacter->TryDamageByAbility(GetActorLocation(), Damage, DamageRange);
+				TDCharacter->CombatComponent->TryDamageByAbility(GetActorLocation(), Damage, DamageRange);
 			}
 			PrimaryActorTick.SetTickFunctionEnable(false);
 			Destroy();

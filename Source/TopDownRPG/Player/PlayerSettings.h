@@ -28,8 +28,7 @@ public:
 	float MeleeAttackRange = 300;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float MeleeBaseDamage = 10;
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	float PushEnemiesStrength = 10;
+	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float AutoTargetRange = 500;
 	UPROPERTY(EditAnywhere, Category = "Combat")

@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "TopDownRPG/Enemy/EnemyCharacter.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -35,7 +36,22 @@ void ARPGPlayerController::BeginPlay()
 
 void ARPGPlayerController::Tick(float DeltaSeconds)
 {
+	if(ARPGCharacter* TopDownCharacter = Cast<ARPGCharacter>(GetCharacter()))
+	{
+		if(TopDownCharacter->CombatComponent)
+		{
+			AActor* LockTarget = TopDownCharacter->CombatComponent->GetLockTarget();
+			if(LockTarget)
+			{
+				FVector LockTargetPos = LockTarget->GetActorLocation();
+				LockTargetPos.Z -= 50;
+				SetControlRotation(UKismetMathLibrary::FindLookAtRotation(TopDownCharacter->GetActorLocation(), LockTargetPos));
+			}
+		}
+	}
+	
 	Super::Tick(DeltaSeconds);
+	
 }
 
 void ARPGPlayerController::SetupInputComponent()
@@ -75,7 +91,7 @@ void ARPGPlayerController::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddYawInput(LookAxisVector.X);
-	AddPitchInput(LookAxisVector.Y);
+	AddPitchInput(LookAxisVector.Y / 2);
 }
 
 void ARPGPlayerController::Jump(const FInputActionValue& Value)

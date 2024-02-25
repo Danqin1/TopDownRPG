@@ -11,8 +11,6 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "TopDownRPG/Interfaces/IDamageable.h"
-#include "TopDownRPG/UI/DamageIndicatorActor.h"
 #include "TopDownRPG/UI/HUD/PlayerHUD.h"
 #include "RPGCharacter.generated.h"
 
@@ -45,28 +43,14 @@ class ARPGCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
-	float SwordTraceRadius = 20;
-	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
-	float SwordTraceDelay = 0.05;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	UPlayerSettings* Settings = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Indication")
-	TSubclassOf<ADamageIndicatorActor> DamageIndicator;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UAIPerceptionStimuliSourceComponent* StimulusSourceComponent;
 	
 	UPROPERTY(EditDefaultsOnly, Category="HUD")
 	TSubclassOf<class UPlayerHUD> PlayerHUDClass;
-
-	UPROPERTY()
-	TArray<IIDamageable*> DamagedActors;
-
-	bool bIsTracingSword = false;
-	float CurrentDamage = 0;
 	
 protected:
 	// To add mapping context
@@ -92,11 +76,5 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	
-	void StartSwordTrace();
-	void EndSwordTrace();
-	void ModifyDamage(float NewDamage);
-	void ClearDamageModifier();
-	void TryDamageByAbility(const FVector Position, float Damage, const float Range = 10);
 };
 

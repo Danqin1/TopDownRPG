@@ -25,7 +25,7 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 	{
 		if(ARPGCharacter* CasterCharacter = Cast<ARPGCharacter>(Caster))
 		{
-			CasterCharacter->ModifyDamage(Damage);
+			CasterCharacter->CombatComponent->ModifyDamage(Damage);
 			
 			FTimerHandle TimerHandle;
 			float AnimTime = SlashAnimation->GetSectionLength(0);
@@ -34,7 +34,7 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 			{
 				if(CasterCharacter)
 				{
-					CasterCharacter->ClearDamageModifier();
+					CasterCharacter->CombatComponent->ClearDamageModifier();
 				}
 				Destroy();
 			}, AnimTime, false, AnimTime);
