@@ -29,6 +29,22 @@ AEnemyCharacter::AEnemyCharacter()
 
 void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity)
 {
+	FVector Dir = HitVelocity;
+	Dir.Normalize();
+	FVector Right = GetActorRightVector();
+	Right.Normalize();
+	
+	if(Dir.Dot(Right) > 0)
+	{
+		if(HitReactionRight)
+		{
+			PlayAnimMontage(HitReactionRight);
+		}
+	}
+	else if(HitReactionLeft)
+	{
+		PlayAnimMontage(HitReactionLeft);
+	}
 	LaunchCharacter(HitVelocity, false, false);
 }
 

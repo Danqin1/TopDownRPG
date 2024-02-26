@@ -55,6 +55,10 @@ void UCombatComponent::OnAttack()
 	{
 		if(ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
 		{
+			if(CharacterMovement->IsFalling() || RPGPlayer->GetCurrentMontage() == DodgeAnim)
+			{
+				return;
+			}
 			if(RPGPlayer->InventoryComponent->HasEquippedWeapon())
 			{
 				currentComboIndex = 0;
@@ -76,6 +80,10 @@ void UCombatComponent::OnDodge()
 	{
 		if(ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
 		{
+			if(CharacterMovement->IsFalling() || RPGPlayer->GetCurrentMontage() == DodgeAnim)
+			{
+				return;
+			}
 			RPGPlayer->StopAnimMontage();
 			RPGPlayer->PlayAnimMontage(DodgeAnim);
 			currentComboIndex = 0;

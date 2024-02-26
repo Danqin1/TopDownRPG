@@ -31,6 +31,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Data")
 	UDataTable* Data;
 
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	UAnimMontage* HitReactionLeft;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	UAnimMontage* HitReactionRight;
+
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* LifeBar;
 
