@@ -7,6 +7,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "TopDownRPG/Enemy/EnemyCharacter.h"
 
 
 // Sets default values
@@ -49,6 +50,34 @@ void AEnemyAIController::BeginPlay()
 	GetPerceptionComponent()->OnTargetPerceptionForgotten.AddDynamic(this, &AEnemyAIController::OnTargetForgotten);
 }
 
+void AEnemyAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if(ControllerCharacter)
+	{
+		ControllerCharacter->OnAirborne.Remove(AirborneHandle);
+		if(auto* StateCharacter = Cast<IICharacterState>(ControllerCharacter))
+		{
+			StateCharacter->OnStateChanged.RemoveDynamic(this, &AEnemyAIController::OnStateChanged);
+		}
+	}
+	Super::EndPlay(EndPlayReason);
+}
+
+void AEnemyAIController::OnPossess(APawn* InPawn)
+{
+	if(auto* EnemyCharacter = Cast<AEnemyCharacter>(InPawn))
+	{
+		ControllerCharacter = EnemyCharacter;
+		AirborneHandle = EnemyCharacter->OnAirborne.AddUObject(this, &AEnemyAIController::OnCharacterAirborne);
+		if(auto* StateCharacter = Cast<IICharacterState>(EnemyCharacter))
+		{
+			StateCharacter->OnStateChanged.AddDynamic(this, &AEnemyAIController::OnStateChanged);
+		}
+	}
+	
+	Super::OnPossess(InPawn);
+}
+
 void AEnemyAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	if(Stimulus.WasSuccessfullySensed())
@@ -60,6 +89,16 @@ void AEnemyAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus St
 void AEnemyAIController::OnTargetForgotten(AActor* Actor)
 {
 	GetBlackboardComponent()->SetValueAsObject(Param_TargetPlayer, nullptr);
+}
+
+void AEnemyAIController::OnCharacterAirborne(bool isAirborne)
+{
+	GetBlackboardComponent()->SetValueAsBool(Param_Airborne, isAirborne);
+}
+
+void AEnemyAIController::OnStateChanged(ECharacterState State)
+{
+	GetBlackboardComponent()->SetValueAsEnum(Param_State, State);
 }
 
 // Called every frame

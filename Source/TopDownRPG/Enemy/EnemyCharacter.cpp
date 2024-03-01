@@ -25,6 +25,34 @@ AEnemyCharacter::AEnemyCharacter()
 	}
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMeshComponent");
+	WeaponMeshComponent->SetCollisionProfileName("NoCollision");
+}
+
+ECharacterState AEnemyCharacter::GetState()
+{
+	return CurrentState;
+}
+
+void AEnemyCharacter::SetState(ECharacterState NewState)
+{
+	if(NewState != CurrentState)
+	{
+		CurrentState = NewState;
+		if(OnStateChanged.IsBound())
+		{
+			OnStateChanged.Broadcast(CurrentState);
+		}
+	}
+}
+
+void AEnemyCharacter::ClearState(ECharacterState State)
+{
+	if(CurrentState == State)
+	{
+		SetState(Nothing);
+	}
 }
 
 void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity)
@@ -46,6 +74,15 @@ void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelo
 		PlayAnimMontage(HitReactionLeft);
 	}
 	LaunchCharacter(HitVelocity, false, false);
+	if(bIsDead)
+	{
+		GetMesh()->AddForceToAllBodiesBelow(HitVelocity, "pelvis", true);
+	}
+}
+
+void AEnemyCharacter::OnHitReaction(UAnimMontage* ReactionMontage)
+{
+	PlayAnimMontage(ReactionMontage);
 }
 
 void AEnemyCharacter::Damage(float Damage)
@@ -86,6 +123,8 @@ void AEnemyCharacter::BeginPlay()
 			}
 
 			GetCharacterMovement()->MaxWalkSpeed = EnemyData->MoveSpeed;
+			WeaponMeshComponent->SetStaticMesh(EnemyData->Weapoon);
+			WeaponMeshComponent->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, "weapon_r");
 		}
 		
 		if(UEnemyLifebar* HPBar = Cast<UEnemyLifebar>(LifeBar->GetWidget()))
@@ -98,6 +137,14 @@ void AEnemyCharacter::BeginPlay()
 bool AEnemyCharacter::CanDamage()
 {
 	return !bIsDead;
+}
+
+void AEnemyCharacter::SetAirborne(bool isArborne)
+{
+	if(OnAirborne.IsBound())
+	{
+		OnAirborne.Broadcast(isArborne);
+	}
 }
 
 // Called every frame

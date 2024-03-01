@@ -20,6 +20,11 @@ ARPGPlayerController::ARPGPlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
+void ARPGPlayerController::ToggleUsingSkill()
+{
+	bIsUsingSkill = !bIsUsingSkill;
+}
+
 void ARPGPlayerController::BeginPlay()
 {
 	// Call the base class  
@@ -41,6 +46,7 @@ void ARPGPlayerController::Tick(float DeltaSeconds)
 		if(TopDownCharacter->CombatComponent)
 		{
 			AActor* LockTarget = TopDownCharacter->CombatComponent->GetLockTarget();
+			
 			if(LockTarget)
 			{
 				FVector LockTargetPos = LockTarget->GetActorLocation();
@@ -49,9 +55,6 @@ void ARPGPlayerController::Tick(float DeltaSeconds)
 			}
 		}
 	}
-	
-	Super::Tick(DeltaSeconds);
-	
 }
 
 void ARPGPlayerController::SetupInputComponent()
@@ -76,6 +79,7 @@ void ARPGPlayerController::SetupInputComponent()
 
 void ARPGPlayerController::Move(const FInputActionValue& Value)
 {
+	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	const FRotator Rotation = GetControlRotation();
@@ -96,6 +100,10 @@ void ARPGPlayerController::Look(const FInputActionValue& Value)
 
 void ARPGPlayerController::Jump(const FInputActionValue& Value)
 {
+	if(bIsUsingSkill)
+	{
+		return;
+	}
 	GetCharacter()->Jump();
 }
 

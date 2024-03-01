@@ -56,7 +56,33 @@ ARPGCharacter::ARPGCharacter()
 	AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat Component"));
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction Component"));
 	StimulusSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus Source"));
+}
+
+ECharacterState ARPGCharacter::GetState()
+{
+	return PlayerState;
+}
+
+void ARPGCharacter::SetState(ECharacterState NewState)
+{
+	if(NewState != PlayerState)
+	{
+		PlayerState = NewState;
+		if(OnStateChanged.IsBound())
+		{
+			OnStateChanged.Broadcast(PlayerState);
+		}
+	}
+}
+
+void ARPGCharacter::ClearState(ECharacterState State)
+{
+	if(PlayerState == State)
+	{
+		SetState(Nothing);
+	}
 }
 
 void ARPGCharacter::BeginPlay()

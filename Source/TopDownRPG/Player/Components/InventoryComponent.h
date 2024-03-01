@@ -49,5 +49,8 @@ public:
 	UFUNCTION()
 	void ToggleMelee();
 
+	void EquipWeapon();
+	void HideWeapon();
+
 	inline bool HasEquippedWeapon() { return bEquippedWeapon; }
 };

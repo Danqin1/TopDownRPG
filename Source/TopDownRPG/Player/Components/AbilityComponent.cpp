@@ -5,7 +5,6 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Player/RPGCharacter.h"
 #include "TopDownRPG/Player/RPGPlayerController.h"
@@ -30,6 +29,8 @@ void UAbilityComponent::SetupComponent()
 	if(ARPGCharacter* Player = Cast<ARPGCharacter>(GetOwner()))
 	{
 		PlayerHUD = Player->PlayerHUD;
+		CharacterState = Cast<IICharacterState>(Player);
+		check(CharacterState.Get());
 		check(PlayerHUD);
 	}
 	
@@ -38,60 +39,28 @@ void UAbilityComponent::SetupComponent()
 	ChangeAbilityOnIndex(1, Ability2);
 	ChangeAbilityOnIndex(2, Ability3);
 	ChangeAbilityOnIndex(3, Ability4);
-	ChangeAbilityOnIndex(4, Ability5);
-	ChangeAbilityOnIndex(5, Ability6);
 }
 
 void UAbilityComponent::Dispose()
-{
-}
+{}
 
 void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction)
-{
-	/*if(CurrentCastingIndicator && CurrentCastingAbility)
-	{
-		if(PlayerController)
-		{
-			FHitResult Hit = PlayerController->GetLastMouseHit();
-			FVector MouseDirection = Hit.Location - GetOwner()->GetActorLocation();
-			MouseDirection.Normalize();
-			
-			switch (CurrentCastingAbility->CastType)
-			{
-			case Direction:
-				CurrentCastingIndicator->SetActorLocation(GetOwner()->GetActorLocation()
-					+ MouseDirection * CurrentCastingIndicator->Length);
-				CurrentCastingIndicator->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetOwner()->GetActorLocation(), Hit.Location));
-				break;
-			case Target:
-				CurrentCastingIndicator->SetActorLocation(Hit.Location);
-				break;
-			}
-		}
-	}*/
-}
+{}
 
 void UAbilityComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
+	if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
 	{
 		Input->BindAction(Ability1Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility1);
 		Input->BindAction(Ability2Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility2);
 		Input->BindAction(Ability3Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility3);
 		Input->BindAction(Ability4Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility4);
-		Input->BindAction(Ability5Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility5);
-		Input->BindAction(Ability6Action, ETriggerEvent::Started, this, &UAbilityComponent::OnAbility6);
-
-		Input->BindAction(Ability1Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-		Input->BindAction(Ability2Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-		Input->BindAction(Ability3Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-		Input->BindAction(Ability4Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-		Input->BindAction(Ability5Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-		Input->BindAction(Ability6Action, ETriggerEvent::Completed, this, &UAbilityComponent::CastAbility);
-	}*/
+		Input->BindAction(SkillCastingAction, ETriggerEvent::Started, this, &UAbilityComponent::ToggleUsingSkill);
+		Input->BindAction(SkillCastingAction, ETriggerEvent::Completed, this, &UAbilityComponent::ToggleUsingSkill);
+	}
 }
 
 void UAbilityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -119,73 +88,44 @@ void UAbilityComponent::OnAbility4()
 	TryUseAbility(CurrentAbilities[3]);
 }
 
-void UAbilityComponent::OnAbility5()
+void UAbilityComponent::ToggleUsingSkill()
 {
-	TryUseAbility(CurrentAbilities[4]);
-}
-
-void UAbilityComponent::OnAbility6()
-{
-	TryUseAbility(CurrentAbilities[5]);
-}
-
-void UAbilityComponent::TryUseAbility(AAbility* Ability)
-{
-	if(Ability && Ability->CanUseAbility())
+	if(CharacterState->GetState() != Skill)
 	{
-		InitAbility(Ability);
+		CharacterState->SetState(Skill);
 	}
-}
-
-void UAbilityComponent::InitAbility(AAbility* Ability)
-{
-	CurrentCastingAbility = Ability;
-	CurrentCastingAbility->TargetCharacter = nullptr;
-	
-	if(CurrentCastingAbility)
+	else
 	{
-		switch (CurrentCastingAbility->CastType)
+		CharacterState->ClearState(Skill);
+	}
+	
+	if(auto* Player = Cast<ARPGCharacter>(GetOwner()))
+	{
+		if(auto* Controller = Cast<ARPGPlayerController>(Player->GetController()))
 		{
-		case None:
-			CurrentCastingAbility->Activate(PlayerController->GetCharacter());
-			break;
-		case Direction:
-			CurrentCastingIndicator = GetWorld()->SpawnActor<ACaster>(DirectionalCasterClass, GetOwner()->GetTransform());
-			break;
-		case Target:
-			CurrentCastingIndicator = GetWorld()->SpawnActor<ACaster>(TargetCasterClass, GetOwner()->GetTransform());
-			break;
+			Controller->ToggleUsingSkill();
 		}
 	}
 }
 
-void UAbilityComponent::CastAbility()
+void UAbilityComponent::TryUseAbility(AAbility* Ability)
 {
-	if(!CurrentCastingAbility || CurrentCastingAbility->CastType == None)
+	if(CharacterState->GetState() == Skill)
 	{
-		CurrentCastingAbility = nullptr;
-		return;
+		if(Ability && Ability->CanUseAbility())
+		{
+			CastAbility(Ability);
+		}
 	}
+}
 
-	if(CurrentCastingIndicator)
-	{
-		GetWorld()->DestroyActor(CurrentCastingIndicator);
-	}
-	
+void UAbilityComponent::CastAbility(AAbility* Ability)
+{
 	if(PlayerController)
 	{
-		//FHitResult HitResult = PlayerController->GetLastMouseHit();
-		
-		/*if(ACharacter* Character =  Cast<ACharacter>(HitResult.GetActor()))
-		{
-			CurrentCastingAbility->TargetCharacter = Character;
-		}*/
-		
-		CurrentCastingAbility->CastLocation = GetOwner()->GetActorLocation();//HitResult.Location;
-		CurrentCastingAbility->SetActorLocation(GetOwner()->GetActorLocation());
-		CurrentCastingAbility->Activate(PlayerController->GetCharacter());
-		
-		CurrentCastingAbility = nullptr;
+		Ability->CastLocation = GetOwner()->GetActorLocation();
+		Ability->SetActorLocation(GetOwner()->GetActorLocation());
+		Ability->Activate(PlayerController->GetCharacter());
 	}
 }
 

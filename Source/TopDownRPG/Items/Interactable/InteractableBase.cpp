@@ -17,7 +17,6 @@ AInteractableBase::AInteractableBase()
 void AInteractableBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 ARPGPlayerController* AInteractableBase::GetPlayerController()
@@ -29,32 +28,6 @@ ARPGPlayerController* AInteractableBase::GetPlayerController()
 	return nullptr;
 }
 
-void AInteractableBase::CustomOnEndMouseOver(UPrimitiveComponent* TouchedComponent)
-{
-	if(NormalMat)
-	{
-		MeshComponent->SetMaterial(0, NormalMat);
-	}
-}
-
-void AInteractableBase::CustomOnBeginMouseOver(UPrimitiveComponent* TouchedComponent)
-{
-	if(HoverMat)
-	{
-		MeshComponent->SetMaterial(0, HoverMat);
-	}
-}
-
-void AInteractableBase::OnClicked()
-{
-	ARPGPlayerController* PC = GetPlayerController();
-	/*if(PC)
-	{
-		PC->SetInteractWith(this, MaxInteractionRange);
-	}*/
-}
-
 void AInteractableBase::Interact(ARPGCharacter* Character)
 {
-	
 }

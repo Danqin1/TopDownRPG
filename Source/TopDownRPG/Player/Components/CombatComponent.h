@@ -8,6 +8,7 @@
 #include "NiagaraSystem.h"
 #include "RPGActorComponentBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "TopDownRPG/Interfaces/ICharacterState.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 #include "TopDownRPG/Player/HitCameraShake.h"
 #include "TopDownRPG/UI/DamageIndicatorActor.h"
@@ -22,6 +23,9 @@ class TOPDOWNRPG_API UCombatComponent : public URPGActorComponentBase
 	bool bTimeSlowed = false;
 	float timeSLowDuration = 0;
 	bool bCanSlowTime = false;
+	bool bAttackChangeRotation = false;
+	float attackRotAlpha = 0;
+	float currentDamage = 0;
 	
 	UPROPERTY()
 	TArray<IIDamageable*> DamagedActors;
@@ -31,6 +35,8 @@ class TOPDOWNRPG_API UCombatComponent : public URPGActorComponentBase
 	UCharacterMovementComponent* CharacterMovement;
 	UPROPERTY()
 	UInventoryComponent* InventoryComponent;
+
+	TWeakInterfacePtr<IICharacterState> CharacterState;
 public:
 	// Sets default values for this component's properties
 	UCombatComponent();
@@ -44,12 +50,14 @@ public:
 
 	void TryContinueCombo();
 	AActor* GetLockTarget();
+	AActor* GetSoftLockTarget();
 	void StartSwordTrace();
 	void EndSwordTrace();
 	void ModifyDamage(float NewDamage);
 	void ClearDamageModifier();
 	void TryDamageByAbility(const FVector Position, float Damage, const float Range = 10);
-	
+	void SoftLockOff();
+	void SoftLockOn();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
 	float SwordTraceRadius = 20;
@@ -71,14 +79,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Indication")
 	UNiagaraSystem* BloodVFX;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Indication")
+	UNiagaraComponent* SwordTraceVFXComponent;
+
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
 	TArray<UAnimMontage*> NormalAttackComboAnimations;
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
-	UAnimMontage* DodgeAnim;
-
+	UAnimMontage* AirborneComboReaction;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
-	int ComboLock = 2;
+	UAnimMontage* DodgeAnim;
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
 	TSubclassOf<UHitCameraShake> SwordHitCameraShake;
@@ -88,10 +99,9 @@ protected:
 
 	UPROPERTY()
 	AActor* LockTarget = nullptr;
+	AActor* SoftLockTarget = nullptr;
 	FDelegateHandle LockTargetDieHandle;
 	
-	float lastAttackInputTime = 0;
-	bool bIsAttacking = false;
 	int currentComboIndex = 0;
 	bool bShouldContinueCombo = false;
 
@@ -109,4 +119,9 @@ protected:
 
 	UFUNCTION()
 	void OnEnemyDied();
+
+	UFUNCTION()
+	void OnCharacterStateChanged(ECharacterState State);
+
+	void PlayMontage(UAnimMontage* Montage);
 };

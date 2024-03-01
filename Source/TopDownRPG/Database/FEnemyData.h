@@ -16,6 +16,9 @@ public:
 	TSubclassOf<UAnimInstance> AnimBP;
 
 	UPROPERTY(EditAnywhere, Category="Combat")
+	UStaticMesh* Weapoon;
+	
+	UPROPERTY(EditAnywhere, Category="Combat")
 	float MaxHP = 100;
 	
 	UPROPERTY(EditAnywhere, Category="Combat")

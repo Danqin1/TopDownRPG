@@ -33,11 +33,6 @@ protected:
 	virtual void BeginPlay() override;
 	ARPGPlayerController* GetPlayerController();
 
-	UFUNCTION()
-	virtual void CustomOnEndMouseOver(UPrimitiveComponent* TouchedComponent);
-	UFUNCTION()
-	virtual void CustomOnBeginMouseOver(UPrimitiveComponent* TouchedComponent);
 public:
-	virtual void OnClicked() override;
 	virtual void Interact(ARPGCharacter* Character) override;
 };

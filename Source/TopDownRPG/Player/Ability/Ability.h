@@ -39,7 +39,7 @@ public:
 	UTexture2D* Icon = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	TEnumAsByte<CastType> CastType = None;
+	TEnumAsByte<ECastType> CastType = None;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TArray<TSubclassOf<class AAbilityEffect>> Effects;

@@ -53,7 +53,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 float UInventoryComponent::GetCurrentWeaponDamage()
 {
-	return 10;// TODO add weapons control
+	return 20;// TODO add weapons control
 }
 
 void UInventoryComponent::ToggleMelee()
@@ -66,9 +66,6 @@ void UInventoryComponent::ToggleMelee()
 			{
 				Character->PlayAnimMontage(GetWeaponAnim);
 			}
-
-			WeaponMeleeHandle->SetStaticMesh(WeaponMeleeBackIdle->GetStaticMesh());
-			WeaponMeleeBackIdle->SetStaticMesh(nullptr);
 		}
 		else
 		{
@@ -76,11 +73,21 @@ void UInventoryComponent::ToggleMelee()
 			{
 				Character->PlayAnimMontage(HideWeaponAnim);
 			}
-
-			WeaponMeleeBackIdle->SetStaticMesh(WeaponMeleeHandle->GetStaticMesh());
-			WeaponMeleeHandle->SetStaticMesh(nullptr);
 		}
-		bEquippedWeapon = !bEquippedWeapon;
 	}
+}
+
+void UInventoryComponent::EquipWeapon()
+{
+	WeaponMeleeHandle->SetStaticMesh(WeaponMeleeBackIdle->GetStaticMesh());
+	WeaponMeleeBackIdle->SetStaticMesh(nullptr);
+	bEquippedWeapon = true;
+}
+
+void UInventoryComponent::HideWeapon()
+{
+	WeaponMeleeBackIdle->SetStaticMesh(WeaponMeleeHandle->GetStaticMesh());
+	WeaponMeleeHandle->SetStaticMesh(nullptr);
+	bEquippedWeapon = false;
 }
 

@@ -24,3 +24,8 @@ void AAbilityEffect_ConeOfFlames::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AAbilityEffect_ConeOfFlames::Activate(ACharacter* Caster)
+{
+	Super::Activate(Caster);
+}
+

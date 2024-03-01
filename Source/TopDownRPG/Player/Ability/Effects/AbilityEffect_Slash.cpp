@@ -2,7 +2,12 @@
 
 
 #include "AbilityEffect_Slash.h"
+
+#include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "TopDownRPG/Enemy/EnemyCharacter.h"
+#include "TopDownRPG/Interfaces/Enemy.h"
 #include "TopDownRPG/Player/RPGCharacter.h"
 
 
@@ -25,22 +30,70 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 	{
 		if(ARPGCharacter* CasterCharacter = Cast<ARPGCharacter>(Caster))
 		{
-			CasterCharacter->CombatComponent->ModifyDamage(Damage);
-			
-			FTimerHandle TimerHandle;
-			float AnimTime = SlashAnimation->GetSectionLength(0);
-		
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, CasterCharacter]()
+			TArray<FHitResult> OutResults;
+			FVector Start = Caster->GetActorLocation();
+			FVector End = Start + Caster->GetActorForwardVector() * TraceLength;
+			TArray<AActor*> ToIgnore;
+			ToIgnore.Add(Caster);
+			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+
+			UKismetSystemLibrary::LineTraceMultiForObjects(GetWorld(), Start, End,
+												   ObjectTypes,
+												   false,
+												   ToIgnore,
+												   EDrawDebugTrace::ForDuration, OutResults, true, FLinearColor::Red,
+												   FLinearColor::Green, 3);
+
+			for (FHitResult OutResult : OutResults)
 			{
-				if(CasterCharacter)
+				if(IEnemy* Enemy = Cast<IEnemy>(OutResult.GetActor()))
 				{
-					CasterCharacter->CombatComponent->ClearDamageModifier();
+					Enemy->OnHitReaction(SlashReactionAnimation);
+					Caster->GetMovementComponent()->StopMovementImmediately();
+					Caster->PlayAnimMontage(SlashAnimation);
+
+					CasterCharacter->CombatComponent->ModifyDamage(Damage);
+			
+					FTimerHandle TimerHandle;
+					float AnimTime = SkillDuration;
+
+					FTimerHandle AttachHandle;
+					float AttachTime = FVector::Dist(OutResult.GetActor() -> GetActorLocation(), CasterCharacter->GetActorLocation()) / 500 * AttachDelay;
+
+					GetWorld()->GetTimerManager().SetTimer(AttachHandle, [this, CasterCharacter, OutResult]()
+					{
+						if(CasterCharacter)
+						{
+							if(auto* enemy = Cast<AEnemyCharacter>(OutResult.GetActor()))
+							{
+								enemy->SetAirborne(true);
+								enemy->GetCharacterMovement()->StopMovementImmediately();
+								enemy->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+							}
+							CasterCharacter->GetMesh()->GetSocketByName(AttachSocketName)->AttachActor(OutResult.GetActor(), CasterCharacter->GetMesh());
+						}
+					}, AttachTime, false, AttachTime);
+					
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, CasterCharacter, OutResult]()
+					{
+						if(CasterCharacter)
+						{
+							CasterCharacter->CombatComponent->ClearDamageModifier();
+							OutResult.GetActor()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+						}
+						if(auto* enemy = Cast<AEnemyCharacter>(OutResult.GetActor()))
+						{
+							enemy->SetAirborne(false);
+							enemy->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+						}
+						Destroy();
+					}, AnimTime, false, AnimTime);
+					
+					return;
 				}
-				Destroy();
-			}, AnimTime, false, AnimTime);
+			}
 		}
-		
-		Caster->GetMovementComponent()->StopMovementImmediately();
-		Caster->PlayAnimMontage(SlashAnimation);
 	}
 }

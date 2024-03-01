@@ -16,7 +16,19 @@ public:
 	AAbilityEffect_Slash();
 protected:
 	UPROPERTY(EditDefaultsOnly)
+	float SkillDuration = 4;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AttachDelay = .5;
+	UPROPERTY(EditDefaultsOnly)
+	FName AttachSocketName = "";
+	
+	UPROPERTY(EditDefaultsOnly)
+	float TraceLength = 700;
+	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* SlashAnimation = nullptr;
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* SlashReactionAnimation = nullptr;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

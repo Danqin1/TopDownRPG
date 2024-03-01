@@ -9,9 +9,21 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTopDownRPG, Log, All);
 DECLARE_MULTICAST_DELEGATE(FOnDieEvent);
 
 UENUM(BlueprintType)
-enum CastType
+enum ECastType
 {
 	None,
 	Direction,
 	Target
+};
+
+UENUM(BlueprintType)
+enum ECharacterState
+{
+	Nothing,
+	Chasing,
+	Attacking,
+	Skill,
+	Interaction,
+	Cutscene,
+	Dead
 };
