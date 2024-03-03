@@ -19,6 +19,7 @@ class TOPDOWNRPG_API AEnemyCharacter : public ACharacter, public IIDamageable, p
 private:
 	GENERATED_BODY()
 
+	bool bIsTracingSword = false;
 public:
 	FDelegateBool OnAirborne;
 	
@@ -37,6 +38,8 @@ public:
 	virtual bool CanDamage() override;
 	void SetAirborne(bool isAirborne);
 	virtual float Attack() override;
+	void StartSwordTrace();
+	void EndSwordTrace();
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* WeaponMeshComponent;

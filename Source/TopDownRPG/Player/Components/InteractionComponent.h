@@ -13,19 +13,20 @@
 #include "InteractionComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(PLayerComponents), meta=(BlueprintSpawnableComponent))
 class TOPDOWNRPG_API UInteractionComponent : public URPGActorComponentBase
 {
 	GENERATED_BODY()
 	
 public:
-	// Sets default values for this component's properties
 	UInteractionComponent();
 	virtual void SetupComponent() override;
 	virtual void Dispose() override;
+	
 protected:
 	UPROPERTY(Transient)
 	UCameraComponent* PlayerCamera;
+	
 	UPROPERTY(Transient)
 	UPlayerHUD* PlayerHUD;
 	

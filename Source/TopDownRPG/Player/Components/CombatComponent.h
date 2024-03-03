@@ -58,6 +58,8 @@ public:
 	void TryDamageByAbility(const FVector Position, float Damage, const float Range = 10);
 	void SoftLockOff();
 	void SoftLockOn();
+	bool CanDamage();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
 	float SwordTraceRadius = 20;

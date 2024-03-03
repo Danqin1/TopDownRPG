@@ -5,17 +5,13 @@
 
 #include "EnhancedInputComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Player/RPGCharacter.h"
 
-
-// Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
 void UInteractionComponent::SetupComponent()
@@ -41,14 +37,9 @@ void UInteractionComponent::Dispose()
 	}
 }
 
-
-// Called when the game starts
 void UInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 void UInteractionComponent::OnInteract()
@@ -60,15 +51,26 @@ void UInteractionComponent::OnInteract()
 			InteractionTarget.Get()->Interact(Character);
 		}
 	}
+	else
+	{
+		DevDebug::OnScreenLog("Interaction Target invalid");
+	}
 }
 
 void UInteractionComponent::OnStateChanged(ECharacterState State)
 {
 	CurrentState = State;
+	if(CurrentState == Nothing)
+	{
+		SetComponentTickEnabled(true);
+	}
+	else
+	{
+		SetComponentTickEnabled(false);
+		InteractionTarget = nullptr;
+	}
 }
 
-
-// Called every frame
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {

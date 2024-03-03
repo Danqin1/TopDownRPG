@@ -6,6 +6,7 @@
 #include "AI/EnemyAIController.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "TopDownRPG/Database/FEnemyData.h"
 #include "TopDownRPG/UI/Enemy/EnemyLifebar.h"
 
@@ -82,7 +83,10 @@ void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelo
 
 void AEnemyCharacter::OnHitReaction(UAnimMontage* ReactionMontage)
 {
-	PlayAnimMontage(ReactionMontage);
+	if(!GetCurrentMontage())
+	{
+		PlayAnimMontage(ReactionMontage);
+	}
 }
 
 void AEnemyCharacter::Damage(float Damage)
@@ -160,9 +164,46 @@ float AEnemyCharacter::Attack()
 	return PlayAnimMontage(AttackAnimation);
 }
 
+void AEnemyCharacter::StartSwordTrace()
+{
+	bIsTracingSword = true;
+}
+
+void AEnemyCharacter::EndSwordTrace()
+{
+	bIsTracingSword = false;
+}
+
 // Called every frame
 void AEnemyCharacter::Tick(float DeltaTime)
 {
+	if (bIsTracingSword)
+	{
+		TArray<FHitResult> OutResults;
+		FVector Start = GetMesh()->GetSocketLocation("weapon_base");
+		FVector End = GetMesh()->GetSocketLocation("weapon_tip");
+		TArray<AActor*> ToIgnore;
+		ToIgnore.Add(this);
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+		UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, 10,
+											   ObjectTypes,
+											   false,
+											   ToIgnore,
+											   EDrawDebugTrace::ForDuration, OutResults, true, FLinearColor::Red,
+											   FLinearColor::Green, DeltaTime * 3);
+
+		for (FHitResult OutResult : OutResults)
+		{
+			if (auto* Damageable = Cast<IIDamageable>(OutResult.GetActor()))
+			{
+				Damageable->Damage(CurrentDamage);
+				bIsTracingSword = false;
+			}
+		}
+	}
+		
 	Super::Tick(DeltaTime);
 }
 

@@ -204,6 +204,15 @@ void UCombatComponent::SoftLockOn()
 	}
 }
 
+bool UCombatComponent::CanDamage()
+{
+	if(ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
+	{
+		return RPGPlayer->GetCurrentMontage() != DodgeAnim;
+	}
+	return true;
+}
+
 void UCombatComponent::OnCharacterStateChanged(ECharacterState State)
 {
 	if(State != Attacking)

@@ -86,6 +86,16 @@ void ARPGCharacter::ClearState(ECharacterState State)
 	}
 }
 
+void ARPGCharacter::Damage(float Damage)
+{
+	PlayerStatsComponent->RemoveHP(Damage);
+}
+
+bool ARPGCharacter::CanDamage()
+{
+	return CombatComponent->CanDamage();
+}
+
 void ARPGCharacter::BeginPlay()
 {
 	Super::BeginPlay();

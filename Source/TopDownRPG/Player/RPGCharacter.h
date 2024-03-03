@@ -17,7 +17,7 @@
 #include "RPGCharacter.generated.h"
 
 UCLASS(Blueprintable)
-class ARPGCharacter : public ACharacter, public  IICharacterState
+class ARPGCharacter : public ACharacter, public  IICharacterState, public IIDamageable
 {
 	GENERATED_BODY()
 
@@ -86,5 +86,8 @@ public:
 	virtual ECharacterState GetState() override;
 	virtual void SetState(ECharacterState NewState) override;
 	virtual void ClearState(ECharacterState State) override;
+
+	virtual void Damage(float Damage) override;
+	virtual bool CanDamage() override;
 };
 
