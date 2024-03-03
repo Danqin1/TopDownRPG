@@ -14,6 +14,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Perception/AISense_Hearing.h"
 #include "Perception/AISense_Sight.h"
+#include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 
 ARPGCharacter::ARPGCharacter()
@@ -88,7 +89,14 @@ void ARPGCharacter::ClearState(ECharacterState State)
 
 void ARPGCharacter::Damage(float Damage)
 {
-	PlayerStatsComponent->RemoveHP(Damage);
+	if(PlayerStatsComponent)
+	{
+		PlayerStatsComponent->RemoveHP(Damage);
+	}
+	else
+	{
+		DevDebug::OnScreenLog("Stats component not exits");
+	}
 }
 
 bool ARPGCharacter::CanDamage()

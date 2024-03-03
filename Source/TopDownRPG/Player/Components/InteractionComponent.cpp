@@ -10,7 +10,7 @@
 
 UInteractionComponent::UInteractionComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
@@ -68,6 +68,7 @@ void UInteractionComponent::OnStateChanged(ECharacterState State)
 	{
 		SetComponentTickEnabled(false);
 		InteractionTarget = nullptr;
+		PlayerHUD->ShowInteraction(false);
 	}
 }
 
@@ -89,7 +90,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 											   false,
 											   ToIgnore,
 											   EDrawDebugTrace::None, OutResults, true, FLinearColor::Red,
-											   FLinearColor::Green, 3);
+											   FLinearColor::Green, DeltaTime * 2);
 
 		if(hitted)
 		{

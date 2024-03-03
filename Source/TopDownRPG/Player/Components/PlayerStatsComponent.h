@@ -39,7 +39,11 @@ protected:
 	float MaxHP = 100;
 	float Mana = 100;
 	float MaxMana = 100;
-	float ManaRegen = .1;
+
+	UPROPERTY(EditDefaultsOnly, Category="Regen")
+	float ManaRegen = .03;
+	UPROPERTY(EditDefaultsOnly, Category="Regen")
+	float HPRegen = .01;
 
 	void UpdateHUD();
 

@@ -50,7 +50,7 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 			{
 				if(IEnemy* Enemy = Cast<IEnemy>(OutResult.GetActor()))
 				{
-					Enemy->OnHitReaction(SlashReactionAnimation);
+					Enemy->OnSkillReaction(SlashReactionAnimation);
 					Caster->GetMovementComponent()->StopMovementImmediately();
 					Caster->PlayAnimMontage(SlashAnimation);
 

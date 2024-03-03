@@ -31,7 +31,7 @@ public:
 	UFUNCTION()
 	virtual void OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity) PURE_VIRTUAL()
 	UFUNCTION()
-	virtual void OnHitReaction(UAnimMontage* ReactionMontage) PURE_VIRTUAL()
+	virtual void OnSkillReaction(UAnimMontage* ReactionMontage) PURE_VIRTUAL()
 	UFUNCTION()
 	virtual FKillPrize GetPrize() {return FKillPrize();}
 };

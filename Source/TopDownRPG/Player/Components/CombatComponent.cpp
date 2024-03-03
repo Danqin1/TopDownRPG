@@ -279,6 +279,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		FVector Start = CharacterMesh->GetSocketLocation("weapon_base");
 		FVector End = CharacterMesh->GetSocketLocation("weapon_tip");
 		TArray<AActor*> ToIgnore;
+		ToIgnore.Add(GetOwner());
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));

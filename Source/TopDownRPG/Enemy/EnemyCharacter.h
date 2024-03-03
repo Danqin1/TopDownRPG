@@ -30,7 +30,7 @@ public:
 	virtual void ClearState(ECharacterState State) override;
 	
 	virtual void OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity) override;
-	virtual void OnHitReaction(UAnimMontage* ReactionMontage) override;
+	virtual void OnSkillReaction(UAnimMontage* ReactionMontage) override;
 	virtual void Damage(float Damage) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

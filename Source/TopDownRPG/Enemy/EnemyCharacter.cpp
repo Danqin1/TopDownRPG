@@ -65,12 +65,12 @@ void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelo
 	
 	if(Dir.Dot(Right) > 0)
 	{
-		if(HitReactionRight)
+		if(HitReactionRight && !GetCurrentMontage())
 		{
 			PlayAnimMontage(HitReactionRight);
 		}
 	}
-	else if(HitReactionLeft)
+	else if(HitReactionLeft && !GetCurrentMontage())
 	{
 		PlayAnimMontage(HitReactionLeft);
 	}
@@ -81,12 +81,10 @@ void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelo
 	}
 }
 
-void AEnemyCharacter::OnHitReaction(UAnimMontage* ReactionMontage)
+void AEnemyCharacter::OnSkillReaction(UAnimMontage* ReactionMontage)
 {
-	if(!GetCurrentMontage())
-	{
-		PlayAnimMontage(ReactionMontage);
-	}
+	EndSwordTrace();
+	PlayAnimMontage(ReactionMontage);
 }
 
 void AEnemyCharacter::Damage(float Damage)
@@ -220,7 +218,8 @@ void AEnemyCharacter::Die()
 	{
 		OnDie.Broadcast();
 	}
-	
+
+	EndSwordTrace();
 	GetMesh()->SetCollisionProfileName("Ragdoll");
 	GetMesh()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

@@ -21,7 +21,11 @@ void UPlayerStatsComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	if(Mana < MaxMana)
 	{
-		AddMana(ManaRegen);
+		AddMana(ManaRegen * DeltaTime);
+	}
+	if(HP < MaxHP)
+	{
+		AddHP(HPRegen * DeltaTime);
 	}
 }
 
