@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TopDownRPG/Items/ItemBase.h"
 #include "TopDownRPG/Interfaces/Interactable.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 #include "TopDownRPG/Player/RPGPlayerController.h"
 #include "InteractableBase.generated.h"
 
@@ -18,6 +19,9 @@ public:
 	AInteractableBase();
 
 protected:
+	UPROPERTY(Transient)
+	ARPGCharacter* InteractCharacter;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Mesh")
 	UStaticMeshComponent* MeshComponent;
 	
@@ -34,5 +38,6 @@ protected:
 	ARPGPlayerController* GetPlayerController();
 
 public:
-	virtual void Interact(ARPGCharacter* Character) override;
+	virtual void Interact(ACharacter* Character) override;
+	virtual void InteractionFinished() override;
 };

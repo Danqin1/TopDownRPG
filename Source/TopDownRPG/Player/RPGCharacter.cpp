@@ -74,6 +74,7 @@ void ARPGCharacter::SetState(ECharacterState NewState)
 		{
 			OnStateChanged.Broadcast(PlayerState);
 		}
+		PlayerHUD->StateChanged(PlayerState);
 	}
 }
 
@@ -113,6 +114,8 @@ void ARPGCharacter::BeginPlay()
 		StimulusSourceComponent->RegisterForSense(TSubclassOf<UAISense_Hearing>());
 		StimulusSourceComponent->RegisterWithPerceptionSystem();
 	}
+
+	SetState(Nothing);
 }
 
 void ARPGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

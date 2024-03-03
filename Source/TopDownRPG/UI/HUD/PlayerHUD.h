@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "W_ActionSlot.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CanvasPanel.h"
 #include "Components/ProgressBar.h"
+#include "Components/SizeBox.h"
+#include "TopDownRPG/TopDownRPG.h"
 #include "PlayerHUD.generated.h"
 
 /**
@@ -23,9 +26,7 @@ protected:
 	UProgressBar* ManaBar;
 
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
-	UW_ActionSlot* PrimaryAction;
-	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
-	UW_ActionSlot* SecondaryAction;
+	UCanvasPanel* InteractionGroup;
 
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	UW_ActionSlot* Action_0;
@@ -39,6 +40,8 @@ public:
 	void SetHP(float Percent);
 	void SetMana(float Percent);
 	void SetAction(int slot, FString name, UTexture2D* icon);
+	void StateChanged(ECharacterState State);
+	void ShowInteraction(bool canInteract);
 
 	UW_ActionSlot* GetUISlot(int index);
 };

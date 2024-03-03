@@ -55,7 +55,7 @@ class ARPGCharacter : public ACharacter, public  IICharacterState
 	TSubclassOf<class UPlayerHUD> PlayerHUDClass;
 	
 protected:
-	ECharacterState PlayerState = Nothing;
+	ECharacterState PlayerState = Dead;
 	
 	// To add mapping context
 	virtual void BeginPlay();

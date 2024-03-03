@@ -37,7 +37,6 @@ class ARPGPlayerController : public APlayerController
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings", meta=(AllowPrivateAccess = "true"))
 	UPlayerSettings* Settings = nullptr;
 protected:
-	bool bIsUsingSkill = false;
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -53,8 +52,6 @@ protected:
 	void OnZoomInOut(const FInputActionValue& Value);
 public:
 	ARPGPlayerController();
-
-	void ToggleUsingSkill();
 };
 
 

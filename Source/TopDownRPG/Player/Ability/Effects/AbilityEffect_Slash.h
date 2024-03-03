@@ -17,6 +17,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	float SkillDuration = 4;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float AirHitsDuration = 1;
 
 	UPROPERTY(EditDefaultsOnly)
 	float AttachDelay = .5;

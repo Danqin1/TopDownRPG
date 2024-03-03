@@ -39,14 +39,26 @@ void UPlayerHUD::SetAction(int slot, FString name, UTexture2D* icon)
 		Action_3->Icon->SetBrushFromTexture(icon, false);
 		Action_3->Name->SetText(FText::FromString(name));
 		break;
-	case 4:
-		PrimaryAction->Icon->SetBrushFromTexture(icon, false);
-		PrimaryAction->Name->SetText(FText::FromString(name));
-		break;
-	case 5:
-		SecondaryAction->Icon->SetBrushFromTexture(icon, false);
-		SecondaryAction->Name->SetText(FText::FromString(name));
-		break;
+	}
+}
+
+void UPlayerHUD::StateChanged(ECharacterState State)
+{
+	Action_0->SetVisibility(State == Skill ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	Action_1->SetVisibility(State == Skill ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	Action_2->SetVisibility(State == Skill ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	Action_3->SetVisibility(State == Skill ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void UPlayerHUD::ShowInteraction(bool canInteract)
+{
+	if(canInteract && InteractionGroup->GetVisibility() == ESlateVisibility::Hidden)
+	{
+		InteractionGroup->SetVisibility(ESlateVisibility::Visible);
+	}
+	if(!canInteract && InteractionGroup->GetVisibility() == ESlateVisibility::Visible)
+	{
+		InteractionGroup->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -58,8 +70,6 @@ UW_ActionSlot* UPlayerHUD::GetUISlot(int index)
 	case 1: return Action_1;
 	case 2: return Action_2;
 	case 3: return Action_3;
-	case 4: return PrimaryAction;
-	case 5: return SecondaryAction;
 		default: return nullptr;
 	}
 }

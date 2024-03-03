@@ -98,14 +98,6 @@ void UAbilityComponent::ToggleUsingSkill()
 	{
 		CharacterState->ClearState(Skill);
 	}
-	
-	if(auto* Player = Cast<ARPGCharacter>(GetOwner()))
-	{
-		if(auto* Controller = Cast<ARPGPlayerController>(Player->GetController()))
-		{
-			Controller->ToggleUsingSkill();
-		}
-	}
 }
 
 void UAbilityComponent::TryUseAbility(AAbility* Ability)

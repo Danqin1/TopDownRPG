@@ -39,7 +39,7 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 			ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 
-			UKismetSystemLibrary::LineTraceMultiForObjects(GetWorld(), Start, End,
+			UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, 60,
 												   ObjectTypes,
 												   false,
 												   ToIgnore,
@@ -75,19 +75,30 @@ void AAbilityEffect_Slash::Activate(ACharacter* Caster)
 							CasterCharacter->GetMesh()->GetSocketByName(AttachSocketName)->AttachActor(OutResult.GetActor(), CasterCharacter->GetMesh());
 						}
 					}, AttachTime, false, AttachTime);
+
+					FTimerHandle EndHitHandle;
+					float EndHitTime = AttachTime + AirHitsDuration;
+
+					GetWorld()->GetTimerManager().SetTimer(EndHitHandle, [this, CasterCharacter, OutResult]()
+					{
+						if(CasterCharacter)
+						{
+							if(auto* enemy = Cast<AEnemyCharacter>(OutResult.GetActor()))
+							{
+								enemy->SetAirborne(false);
+								enemy->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+							}
+							OutResult.GetActor()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+						}
+					}, EndHitTime, false, EndHitTime);
 					
 					GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, CasterCharacter, OutResult]()
 					{
 						if(CasterCharacter)
 						{
 							CasterCharacter->CombatComponent->ClearDamageModifier();
-							OutResult.GetActor()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 						}
-						if(auto* enemy = Cast<AEnemyCharacter>(OutResult.GetActor()))
-						{
-							enemy->SetAirborne(false);
-							enemy->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-						}
+						
 						Destroy();
 					}, AnimTime, false, AnimTime);
 					

@@ -20,11 +20,6 @@ ARPGPlayerController::ARPGPlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
-void ARPGPlayerController::ToggleUsingSkill()
-{
-	bIsUsingSkill = !bIsUsingSkill;
-}
-
 void ARPGPlayerController::BeginPlay()
 {
 	// Call the base class  
@@ -100,9 +95,12 @@ void ARPGPlayerController::Look(const FInputActionValue& Value)
 
 void ARPGPlayerController::Jump(const FInputActionValue& Value)
 {
-	if(bIsUsingSkill)
+	if(auto * RPGCharacter = Cast<ARPGCharacter>(GetCharacter()))
 	{
-		return;
+		if(RPGCharacter->GetState() == Skill)
+		{
+			return;
+		}
 	}
 	GetCharacter()->Jump();
 }

@@ -34,7 +34,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void BeginPlay() override;
 	virtual bool CanDamage() override;
-	void SetAirborne(bool isArborne);
+	void SetAirborne(bool isAirborne);
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* WeaponMeshComponent;

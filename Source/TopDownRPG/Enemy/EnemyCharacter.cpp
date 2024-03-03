@@ -73,7 +73,7 @@ void AEnemyCharacter::OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelo
 	{
 		PlayAnimMontage(HitReactionLeft);
 	}
-	LaunchCharacter(HitVelocity, false, false);
+	//LaunchCharacter(HitVelocity, false, false);
 	if(bIsDead)
 	{
 		GetMesh()->AddForceToAllBodiesBelow(HitVelocity, "pelvis", true);
@@ -139,11 +139,19 @@ bool AEnemyCharacter::CanDamage()
 	return !bIsDead;
 }
 
-void AEnemyCharacter::SetAirborne(bool isArborne)
+void AEnemyCharacter::SetAirborne(bool isAirborne)
 {
 	if(OnAirborne.IsBound())
 	{
-		OnAirborne.Broadcast(isArborne);
+		OnAirborne.Broadcast(isAirborne);
+	}
+	if(isAirborne)
+	{
+		GetCharacterMovement()->GravityScale = 0;
+	}
+	else
+	{
+		GetCharacterMovement()->GravityScale = 1;
 	}
 }
 

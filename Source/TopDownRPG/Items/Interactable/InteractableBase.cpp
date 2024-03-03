@@ -3,6 +3,8 @@
 
 #include "InteractableBase.h"
 
+#include "TopDownRPG/Player/RPGCharacter.h"
+
 
 // Sets default values
 AInteractableBase::AInteractableBase()
@@ -28,6 +30,19 @@ ARPGPlayerController* AInteractableBase::GetPlayerController()
 	return nullptr;
 }
 
-void AInteractableBase::Interact(ARPGCharacter* Character)
+void AInteractableBase::Interact(ACharacter* Character)
 {
+	if(auto* RPGCharacter = Cast<ARPGCharacter>(Character))
+	{
+		InteractCharacter = RPGCharacter;
+		InteractCharacter->SetState(Interaction);
+	}
+}
+
+void AInteractableBase::InteractionFinished()
+{
+	if(InteractCharacter)
+	{
+		InteractCharacter->ClearState(Interaction);
+	}
 }

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TopDownRPG/Player/RPGCharacter.h"
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
@@ -21,5 +20,6 @@ class TOPDOWNRPG_API IInteractable
 {
 	GENERATED_BODY()
 public:
-	virtual void Interact(ARPGCharacter* Character) PURE_VIRTUAL()
+	virtual void Interact(ACharacter* Character) PURE_VIRTUAL()
+	virtual void InteractionFinished() PURE_VIRTUAL()
 };
