@@ -7,6 +7,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "TopDownRPG/DevDebug.h"
 #include "TopDownRPG/Enemy/EnemyCharacter.h"
 
 
@@ -78,11 +79,19 @@ void AEnemyAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 }
 
+ETeamAttitude::Type AEnemyAIController::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	return ETeamAttitude::Friendly;
+}
+
 void AEnemyAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if(Stimulus.WasSuccessfullySensed())
+	if(!Cast<AEnemyCharacter>(Actor))
 	{
-		GetBlackboardComponent()->SetValueAsObject(Param_TargetPlayer, Actor);
+		if(Stimulus.WasSuccessfullySensed())
+		{
+			GetBlackboardComponent()->SetValueAsObject(Param_TargetPlayer, Actor);
+		}
 	}
 }
 

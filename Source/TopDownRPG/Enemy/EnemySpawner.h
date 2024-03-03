@@ -23,6 +23,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AEnemyCharacter> EnemyToSpawn;
+	UPROPERTY(EditAnywhere)
+	int MaxEnemies = 1;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

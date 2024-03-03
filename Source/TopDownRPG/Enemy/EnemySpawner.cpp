@@ -30,7 +30,7 @@ void AEnemySpawner::Tick(float DeltaTime)
 	FVector Location = GetActorLocation();
 
 	UGameplayStatics::GetAllActorsWithInterface(GetWorld(), UEnemy::StaticClass(), SpawnedEnemies);
-	if(SpawnedEnemies.Num() > 10)
+	if(SpawnedEnemies.Num() > MaxEnemies)
 	{
 		return;
 	}

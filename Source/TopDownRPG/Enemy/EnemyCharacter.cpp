@@ -155,6 +155,11 @@ void AEnemyCharacter::SetAirborne(bool isAirborne)
 	}
 }
 
+float AEnemyCharacter::Attack()
+{
+	return PlayAnimMontage(AttackAnimation);
+}
+
 // Called every frame
 void AEnemyCharacter::Tick(float DeltaTime)
 {

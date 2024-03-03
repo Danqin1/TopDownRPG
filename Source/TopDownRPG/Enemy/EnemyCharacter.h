@@ -6,6 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "TopDownRPG/Interfaces/Enemy.h"
+#include "TopDownRPG/Interfaces/EnemyCombat.h"
 #include "TopDownRPG/Interfaces/ICharacterState.h"
 #include "TopDownRPG/Interfaces/IDamageable.h"
 #include "EnemyCharacter.generated.h"
@@ -13,7 +14,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FDelegateBool, bool)
 
 UCLASS()
-class TOPDOWNRPG_API AEnemyCharacter : public ACharacter, public IIDamageable, public IEnemy, public IICharacterState
+class TOPDOWNRPG_API AEnemyCharacter : public ACharacter, public IIDamageable, public IEnemy, public IICharacterState, public IEnemyCombat
 {
 private:
 	GENERATED_BODY()
@@ -35,6 +36,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual bool CanDamage() override;
 	void SetAirborne(bool isAirborne);
+	virtual float Attack() override;
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* WeaponMeshComponent;
@@ -50,6 +52,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
 	UAnimMontage* HitReactionRight;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	UAnimMontage* AttackAnimation; /// move to combat component
 
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* LifeBar;
