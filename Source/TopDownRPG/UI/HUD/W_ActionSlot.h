@@ -12,7 +12,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropdown)
 class TOPDOWNRPG_API UW_ActionSlot : public UUserWidget
 {
 	GENERATED_BODY()

@@ -13,12 +13,19 @@ AInteractableBase::AInteractableBase()
 	PrimaryActorTick.bCanEverTick = false;
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	MeshComponent->SetupAttachment(GetRootComponent());
+
+	InteractionWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("InteractionWidget");
+	InteractionWidgetComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void AInteractableBase::BeginPlay()
 {
 	Super::BeginPlay();
+	if(InteractionWidgetComponent)
+	{
+		InteractionWidgetComponent->SetVisibility(false);
+	}
 }
 
 ARPGPlayerController* AInteractableBase::GetPlayerController()
@@ -44,5 +51,13 @@ void AInteractableBase::InteractionFinished()
 	if(InteractCharacter)
 	{
 		InteractCharacter->ClearState(Interaction);
+	}
+}
+
+void AInteractableBase::SetAsTarget(bool isTargeted)
+{
+	if(InteractionWidgetComponent)
+	{
+		InteractionWidgetComponent->SetVisibility(isTargeted);
 	}
 }

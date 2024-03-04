@@ -6,7 +6,7 @@
 #include "TopDownRPG/Items/Interactable/InteractableBase.h"
 #include "Apple.generated.h"
 
-UCLASS()
+UCLASS(HideDropdown)
 class TOPDOWNRPG_API AApple : public AInteractableBase
 {
 	GENERATED_BODY()

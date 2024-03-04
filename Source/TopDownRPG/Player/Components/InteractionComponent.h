@@ -27,9 +27,6 @@ protected:
 	UPROPERTY(Transient)
 	UCameraComponent* PlayerCamera;
 	
-	UPROPERTY(Transient)
-	UPlayerHUD* PlayerHUD;
-	
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* InteractAction;
 	
@@ -42,7 +39,7 @@ protected:
 	
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+	void SetInteractionTarget(IInteractable* Interactable);
 	UFUNCTION()
 	void OnInteract();
 

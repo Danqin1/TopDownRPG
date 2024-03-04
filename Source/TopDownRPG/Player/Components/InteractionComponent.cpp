@@ -24,7 +24,6 @@ void UInteractionComponent::SetupComponent()
 	if(auto* Character = Cast<ARPGCharacter>(GetOwner()))
 	{
 		PlayerCamera = Character->GetFollowCamera();
-		PlayerHUD = Character->PlayerHUD;
 		Character->OnStateChanged.AddDynamic(this, &UInteractionComponent::OnStateChanged);
 	}
 }
@@ -42,6 +41,27 @@ void UInteractionComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UInteractionComponent::SetInteractionTarget(IInteractable* Interactable)
+{
+	if(Interactable)
+	{
+		if(InteractionTarget.Get())
+		{
+			InteractionTarget->SetAsTarget(false);
+		}
+		InteractionTarget = Interactable;
+		InteractionTarget->SetAsTarget(true);
+	}
+	else
+	{
+		if(InteractionTarget.Get())
+		{
+			InteractionTarget->SetAsTarget(false);
+		}
+		InteractionTarget = nullptr;
+	}
+}
+
 void UInteractionComponent::OnInteract()
 {
 	if(InteractionTarget.Get())
@@ -49,6 +69,7 @@ void UInteractionComponent::OnInteract()
 		if(auto * Character = Cast<ARPGCharacter>(GetOwner()))
 		{
 			InteractionTarget.Get()->Interact(Character);
+			SetInteractionTarget(nullptr);
 		}
 	}
 	else
@@ -67,15 +88,14 @@ void UInteractionComponent::OnStateChanged(ECharacterState State)
 	else
 	{
 		SetComponentTickEnabled(false);
-		InteractionTarget = nullptr;
-		PlayerHUD->ShowInteraction(false);
+		SetInteractionTarget(nullptr);
 	}
 }
 
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                           FActorComponentTickFunction* ThisTickFunction)
 {
-	if(PlayerCamera && CurrentState == Nothing && PlayerHUD)
+	if(PlayerCamera && CurrentState == Nothing)
 	{
 		FVector Start = PlayerCamera->GetComponentLocation();
 		FVector End = Start + PlayerCamera->GetForwardVector() * InteractionMaxDistance;
@@ -83,6 +103,7 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		TArray<FHitResult> OutResults;
 		ToIgnore.Add(GetOwner());
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 
 		bool hitted = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, 60,
@@ -98,19 +119,19 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			{
 				if(auto* Interactable = Cast<IInteractable>(OutResult.GetActor()))
 				{
-					InteractionTarget = Interactable;
-					PlayerHUD->ShowInteraction(true);
-					return;
+					if(FVector::Distance(GetOwner()->GetActorLocation(),OutResult.GetActor()->GetActorLocation()) < Interactable->GetInteractionDistance())
+					{
+						SetInteractionTarget(Interactable);
+						return;
+					}
 				}
 			}
 		}
-		InteractionTarget = nullptr;
-		PlayerHUD->ShowInteraction(false);
+		SetInteractionTarget(nullptr);
 	}
 	else
 	{
-		InteractionTarget = nullptr;
-		PlayerHUD->ShowInteraction(false);
+		SetInteractionTarget(nullptr);
 	}
 }
 

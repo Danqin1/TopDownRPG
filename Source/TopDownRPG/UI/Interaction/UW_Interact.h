@@ -4,17 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/ProgressBar.h"
-#include "EnemyLifebar.generated.h"
+#include "Components/TextBlock.h"
+#include "UW_Interact.generated.h"
 
 /**
  * 
  */
 UCLASS(HideDropdown)
-class TOPDOWNRPG_API UEnemyLifebar : public UUserWidget
+class TOPDOWNRPG_API UUW_Interact : public UUserWidget
 {
 	GENERATED_BODY()
-public:
+protected:
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
-	UProgressBar* HPBar;
+	UTextBlock* InteractionText;
+
+public:
+	void SetInteractionText(FString text);
 };

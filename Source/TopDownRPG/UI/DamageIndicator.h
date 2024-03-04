@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropdown)
 class TOPDOWNRPG_API UDamageIndicator : public UUserWidget
 {
 	GENERATED_BODY()

@@ -14,7 +14,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropdown)
 class TOPDOWNRPG_API UPlayerHUD : public UUserWidget
 {
 	GENERATED_BODY()
@@ -24,9 +24,6 @@ protected:
 	UProgressBar* HealthBar;
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	UProgressBar* ManaBar;
-
-	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
-	UCanvasPanel* InteractionGroup;
 
 	UPROPERTY(EditDefaultsOnly, meta=(BindWidget))
 	UW_ActionSlot* Action_0;
@@ -45,7 +42,6 @@ public:
 	void SetMana(float Percent);
 	void SetAction(int slot, FString name, UTexture2D* icon);
 	void StateChanged(ECharacterState State);
-	void ShowInteraction(bool canInteract);
 
 	UW_ActionSlot* GetUISlot(int index);
 };

@@ -53,18 +53,6 @@ void UPlayerHUD::StateChanged(ECharacterState State)
 	StateDebug->SetText(FText::FromString(EnumToString(enumName, State)));
 }
 
-void UPlayerHUD::ShowInteraction(bool canInteract)
-{
-	if(canInteract && InteractionGroup->GetVisibility() == ESlateVisibility::Hidden)
-	{
-		InteractionGroup->SetVisibility(ESlateVisibility::Visible);
-	}
-	if(!canInteract && InteractionGroup->GetVisibility() == ESlateVisibility::Visible)
-	{
-		InteractionGroup->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
 UW_ActionSlot* UPlayerHUD::GetUISlot(int index)
 {
 	switch (index)

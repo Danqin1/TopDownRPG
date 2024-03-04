@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "DamageIndicatorActor.generated.h"
 
-UCLASS()
+UCLASS(HideDropdown)
 class TOPDOWNRPG_API ADamageIndicatorActor : public AActor
 {
 	GENERATED_BODY()

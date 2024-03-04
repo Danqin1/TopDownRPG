@@ -28,10 +28,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Interaction")
 	float MaxInteractionRange = 200;
 	UPROPERTY(EditDefaultsOnly, Category="Hover")
-	UMaterialInstance* NormalMat;
-
-	UPROPERTY(EditDefaultsOnly, Category="Hover")
-	UMaterialInstance* HoverMat;
+	UWidgetComponent* InteractionWidgetComponent;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,4 +37,5 @@ protected:
 public:
 	virtual void Interact(ACharacter* Character) override;
 	virtual void InteractionFinished() override;
+	virtual void SetAsTarget(bool isTargeted) override;
 };
