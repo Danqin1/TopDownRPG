@@ -102,7 +102,6 @@ protected:
 	UPROPERTY()
 	AActor* LockTarget = nullptr;
 	AActor* SoftLockTarget = nullptr;
-	FDelegateHandle LockTargetDieHandle;
 	
 	int currentComboIndex = 0;
 	bool bShouldContinueCombo = false;

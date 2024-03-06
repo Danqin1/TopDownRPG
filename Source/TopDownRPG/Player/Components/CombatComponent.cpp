@@ -117,7 +117,7 @@ void UCombatComponent::OnTargetLock()
 		{
 			if(IEnemy* Enemy = Cast<IEnemy>(SoftLockTarget))
 			{
-				Enemy->OnDie.Remove(LockTargetDieHandle);
+				Enemy->OnDie.RemoveDynamic(this, &UCombatComponent::OnEnemyDied);
 			}
 		}
 		if(UCameraComponent* Camera = GetOwner()->GetComponentByClass<UCameraComponent>())
@@ -143,7 +143,7 @@ void UCombatComponent::OnTargetLock()
 				if(IEnemy* Enemy = Cast<IEnemy>(OutResult.GetActor()))
 				{
 					LockTarget = OutResult.GetActor();
-					LockTargetDieHandle = Enemy->OnDie.AddUObject(this, &UCombatComponent::OnEnemyDied);
+					Enemy->OnDie.AddDynamic(this, &UCombatComponent::OnEnemyDied);
 					return;
 				}
 			}
@@ -153,7 +153,7 @@ void UCombatComponent::OnTargetLock()
 	{
 		if(IEnemy* Enemy = Cast<IEnemy>(LockTarget))
 		{
-			Enemy->OnDie.Remove(LockTargetDieHandle);
+			Enemy->OnDie.RemoveDynamic(this, &UCombatComponent::OnEnemyDied);
 		}
 		LockTarget = nullptr;
 	}
@@ -195,7 +195,7 @@ void UCombatComponent::SoftLockOn()
 			if(IEnemy* Enemy = Cast<IEnemy>(OutResult.GetActor()))
 			{
 				SoftLockTarget = OutResult.GetActor();
-				LockTargetDieHandle = Enemy->OnDie.AddUObject(this, &UCombatComponent::OnEnemyDied);
+				Enemy->OnDie.AddDynamic(this, &UCombatComponent::OnEnemyDied);
 				return;
 			}
 		}

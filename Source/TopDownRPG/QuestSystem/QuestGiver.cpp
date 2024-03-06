@@ -32,26 +32,17 @@ void AQuestGiver::BeginPlay()
 	}
 }
 
-// Called every frame
-void AQuestGiver::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
-void AQuestGiver::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
 void AQuestGiver::Interact(ACharacter* Character)
 {
 	if(auto* RPGCharacter = Cast<ARPGCharacter>(Character))
 	{
 		InteractCharacter = RPGCharacter;
 		InteractCharacter->SetState(Interaction);
+		UIWidget = CreateWidget<UUW_QuestGIver>(GetWorld(), UIClass);
+		UIWidget->OnClose.AddDynamic(this, &AQuestGiver::InteractionFinished);
+		UIWidget->AddToViewport();
+		UIWidget->Populate(Quests);
 	}
-	InteractionFinished();
 }
 
 void AQuestGiver::InteractionFinished()
@@ -59,6 +50,12 @@ void AQuestGiver::InteractionFinished()
 	if(InteractCharacter)
 	{
 		InteractCharacter->ClearState(Interaction);
+	}
+	if(UIWidget)
+	{
+		UIWidget->RemoveFromParent();
+		UIWidget->Destruct();
+		UIWidget = nullptr;
 	}
 }
 

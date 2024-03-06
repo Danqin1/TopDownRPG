@@ -26,7 +26,7 @@ class TOPDOWNRPG_API IEnemy
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 protected:
 public:
-	FOnDieEvent OnDie;
+	FDynamicEvent OnDie;
 	
 	UFUNCTION()
 	virtual void OnHit(AActor* Hitter, FVector HitPosition, FVector HitVelocity) PURE_VIRTUAL()

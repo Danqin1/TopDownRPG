@@ -14,7 +14,7 @@ class TOPDOWNRPG_API UPlayerStatsComponent : public URPGActorComponentBase
 {
 	GENERATED_BODY()
 public:
-	FOnDieEvent OnDied;
+	FDynamicEvent OnDied;
 	
 	// Sets default values for this component's properties
 	UPlayerStatsComponent(const FObjectInitializer& ObjectInitializer);

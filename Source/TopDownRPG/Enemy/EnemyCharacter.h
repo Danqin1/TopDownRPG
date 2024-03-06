@@ -11,8 +11,6 @@
 #include "TopDownRPG/Interfaces/IDamageable.h"
 #include "EnemyCharacter.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FDelegateBool, bool)
-
 UCLASS()
 class TOPDOWNRPG_API AEnemyCharacter : public ACharacter, public IIDamageable, public IEnemy, public IICharacterState, public IEnemyCombat
 {
@@ -21,7 +19,7 @@ private:
 
 	bool bIsTracingSword = false;
 public:
-	FDelegateBool OnAirborne;
+	FBoolEvent OnAirborne;
 	
 	AEnemyCharacter();
 

@@ -55,7 +55,7 @@ void AEnemyAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if(ControllerCharacter)
 	{
-		ControllerCharacter->OnAirborne.Remove(AirborneHandle);
+		ControllerCharacter->OnAirborne.RemoveDynamic(this, &AEnemyAIController::OnCharacterAirborne);
 		if(auto* StateCharacter = Cast<IICharacterState>(ControllerCharacter))
 		{
 			StateCharacter->OnStateChanged.RemoveDynamic(this, &AEnemyAIController::OnStateChanged);
@@ -69,7 +69,7 @@ void AEnemyAIController::OnPossess(APawn* InPawn)
 	if(auto* EnemyCharacter = Cast<AEnemyCharacter>(InPawn))
 	{
 		ControllerCharacter = EnemyCharacter;
-		AirborneHandle = EnemyCharacter->OnAirborne.AddUObject(this, &AEnemyAIController::OnCharacterAirborne);
+		EnemyCharacter->OnAirborne.AddDynamic(this, &AEnemyAIController::OnCharacterAirborne);
 		if(auto* StateCharacter = Cast<IICharacterState>(EnemyCharacter))
 		{
 			StateCharacter->OnStateChanged.AddDynamic(this, &AEnemyAIController::OnStateChanged);

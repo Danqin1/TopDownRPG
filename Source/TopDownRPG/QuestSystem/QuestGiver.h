@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "TopDownRPG/Interfaces/Interactable.h"
 #include "TopDownRPG/Player/RPGCharacter.h"
+#include "TopDownRPG/UI/Quests/UW_QuestGIver.h"
 #include "QuestGiver.generated.h"
 
 UCLASS()
@@ -21,20 +22,27 @@ public:
 protected:
 	UPROPERTY(Transient)
 	ARPGCharacter* InteractCharacter;
+
+	UPROPERTY(Transient)
+	UUW_QuestGIver* UIWidget;
 	
 	UPROPERTY(EditDefaultsOnly)
 	UWidgetComponent* InteractionWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UUW_QuestGIver> UIClass;
+
+	UPROPERTY(EditAnywhere, Category="Quests") // TODO: Change to use database
+	TArray<FQuest> Quests;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION()
 	virtual void Interact(ACharacter* Character) override;
+	UFUNCTION()
 	virtual void InteractionFinished() override;
+	UFUNCTION()
 	virtual void SetAsTarget(bool isTargeted) override;
 };

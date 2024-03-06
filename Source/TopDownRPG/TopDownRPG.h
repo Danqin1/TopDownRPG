@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TopDownRPG.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTopDownRPG, Log, All);
 
-DECLARE_MULTICAST_DELEGATE(FOnDieEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoolEvent, bool, isTrue);
 
 template<typename T>
 static FString EnumToString(const FString& enumName, const T value)

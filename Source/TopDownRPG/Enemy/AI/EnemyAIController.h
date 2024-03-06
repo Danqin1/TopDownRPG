@@ -16,8 +16,7 @@ class TOPDOWNRPG_API AEnemyAIController : public AAIController
 	FName Param_TargetPlayer = "TargetPlayer";
 	FName Param_Airborne = "IsAirborne";
 	FName Param_State = "State";
-	
-	FDelegateHandle AirborneHandle;
+
 public:
 	// Sets default values for this actor's properties
 	AEnemyAIController();

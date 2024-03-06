@@ -20,9 +20,14 @@ class TOPDOWNRPG_API IInteractable
 {
 	GENERATED_BODY()
 public:
+	UFUNCTION()
 	virtual void SetAsTarget(bool isTargeted) PURE_VIRTUAL()
+	UFUNCTION()
 	virtual void Interact(ACharacter* Character) PURE_VIRTUAL()
+	UFUNCTION()
 	virtual void InteractionFinished() PURE_VIRTUAL()
+	UFUNCTION()
 	virtual bool CanInteract() {return true;}
+	UFUNCTION()
 	virtual float GetInteractionDistance() { return 400;}
 };
