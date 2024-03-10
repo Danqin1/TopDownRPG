@@ -34,5 +34,6 @@ enum ECharacterState
 	Skill,
 	Interaction,
 	Cutscene,
-	Dead
+	Dead,
+	Dragon
 };

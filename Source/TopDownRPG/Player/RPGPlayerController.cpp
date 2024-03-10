@@ -64,7 +64,9 @@ void ARPGPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ARPGPlayerController::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ARPGPlayerController::StopJumping);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ARPGPlayerController::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ARPGPlayerController::MoveEnd);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARPGPlayerController::Look);
+		EnhancedInputComponent->BindAction(DragonForm, ETriggerEvent::Started, this, &ARPGPlayerController::OnDragonForm);
 	}
 	else
 	{
@@ -74,13 +76,20 @@ void ARPGPlayerController::SetupInputComponent()
 
 void ARPGPlayerController::Move(const FInputActionValue& Value)
 {
-	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	
+	if(ARPGCharacter* RPGCharacter = Cast<ARPGCharacter>(GetCharacter()))
+	{
+		if(RPGCharacter->GetState() == Interaction)
+		{
+			return;
+		}
+	}
 	
 	GetCharacter()->AddMovementInput(ForwardDirection, MovementVector.Y);
 	GetCharacter()->AddMovementInput(RightDirection, MovementVector.X);
@@ -89,6 +98,15 @@ void ARPGPlayerController::Move(const FInputActionValue& Value)
 void ARPGPlayerController::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	
+	if(ARPGCharacter* RPGCharacter = Cast<ARPGCharacter>(GetCharacter()))
+	{
+		if(RPGCharacter->GetState() == Interaction)
+		{
+			return;
+		}
+	}
+	
 	AddYawInput(LookAxisVector.X);
 	AddPitchInput(LookAxisVector.Y / 2);
 }
@@ -97,9 +115,13 @@ void ARPGPlayerController::Jump(const FInputActionValue& Value)
 {
 	if(auto * RPGCharacter = Cast<ARPGCharacter>(GetCharacter()))
 	{
-		if(RPGCharacter->GetState() == Skill)
+		if(RPGCharacter->GetState() == Skill || RPGCharacter->GetState() == Interaction)
 		{
 			return;
+		}
+		if(RPGCharacter->GetState() == Dragon)
+		{
+			RPGCharacter->ToggleFlying();
 		}
 	}
 	GetCharacter()->Jump();
@@ -108,6 +130,18 @@ void ARPGPlayerController::Jump(const FInputActionValue& Value)
 void ARPGPlayerController::StopJumping(const FInputActionValue& Value)
 {
 	GetCharacter()->StopJumping();
+}
+
+void ARPGPlayerController::OnDragonForm()
+{
+	if(auto* RPGPlayer = Cast<ARPGCharacter>(GetCharacter()))
+	{
+		RPGPlayer->ChangeForm();
+	}
+}
+
+void ARPGPlayerController::MoveEnd()
+{
 }
 
 void ARPGPlayerController::OnZoomInOut(const FInputActionValue& Value)

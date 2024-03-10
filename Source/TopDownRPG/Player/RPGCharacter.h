@@ -28,22 +28,6 @@ class ARPGCharacter : public ACharacter, public  IICharacterState, public IIDama
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-	
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
-
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* LookAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Settings")
 	UPlayerSettings* Settings = nullptr;
@@ -55,6 +39,7 @@ class ARPGCharacter : public ACharacter, public  IICharacterState, public IIDama
 	TSubclassOf<class UPlayerHUD> PlayerHUDClass;
 	
 protected:
+	bool bIsFlying = false;
 	ECharacterState PlayerState = Dead;
 	
 	// To add mapping context
@@ -75,13 +60,29 @@ public:
 	UCombatComponent* CombatComponent;
 	UPROPERTY(EditDefaultsOnly)
 	UInteractionComponent* InteractionComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category="Character")
+	USkeletalMesh* CharacterMesh;
+	UPROPERTY(EditDefaultsOnly, Category="Character")
+	TSubclassOf<UAnimInstance> CharacterAnimBP;
+
+	UPROPERTY(EditDefaultsOnly, Category="Dragon")
+	USkeletalMesh* DragonMesh;
+	UPROPERTY(EditDefaultsOnly, Category="Dragon")
+	TSubclassOf<UAnimInstance> DragonAnimBP;
+	UPROPERTY(EditDefaultsOnly, Category="Dragon")
+	FVector DragonSocketOffset;
+	UPROPERTY(EditDefaultsOnly, Category="Dragon")
+	float DragonArmLength = 1000;
+	
 	UPROPERTY()
 	UPlayerHUD* PlayerHUD;
-
+	
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce) override;
 
 	virtual ECharacterState GetState() override;
 	virtual void SetState(ECharacterState NewState) override;
@@ -89,5 +90,8 @@ public:
 
 	virtual void Damage(float Damage) override;
 	virtual bool CanDamage() override;
+	void ChangeForm();
+	void ToggleFlying();
+	bool IsFlying() const { return bIsFlying; }
 };
 

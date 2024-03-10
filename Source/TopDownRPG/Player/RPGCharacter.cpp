@@ -61,6 +61,11 @@ ARPGCharacter::ARPGCharacter()
 	StimulusSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Stimulus Source"));
 }
 
+void ARPGCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce)
+{
+	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
+}
+
 ECharacterState ARPGCharacter::GetState()
 {
 	return PlayerState;
@@ -102,6 +107,44 @@ void ARPGCharacter::Damage(float Damage)
 bool ARPGCharacter::CanDamage()
 {
 	return CombatComponent->CanDamage();
+}
+
+void ARPGCharacter::ChangeForm()
+{
+	if(GetState() != Dragon)
+	{
+		GetMesh()->SetSkeletalMesh(DragonMesh);
+		GetMesh()->SetAnimInstanceClass(DragonAnimBP);
+		CameraBoom->TargetArmLength = DragonArmLength;
+		GetCharacterMovement()->MaxAcceleration = 10000;
+		SetState(Dragon);
+	}
+	else
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMesh);
+		GetMesh()->SetAnimInstanceClass(CharacterAnimBP);
+		CameraBoom->TargetArmLength = 400.0f;
+		GetCharacterMovement()->GravityScale = 1;
+		GetCharacterMovement()->MaxAcceleration = 2048;
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		
+		SetState(Nothing);
+	}
+}
+
+void ARPGCharacter::ToggleFlying()
+{
+	bIsFlying = !bIsFlying;
+	if(bIsFlying)
+	{
+		GetCharacterMovement()->GravityScale = 0;
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	}
+	else
+	{
+		GetCharacterMovement()->GravityScale = 1;
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
 }
 
 void ARPGCharacter::BeginPlay()

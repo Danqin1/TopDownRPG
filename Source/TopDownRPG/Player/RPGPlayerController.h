@@ -33,6 +33,8 @@ class ARPGPlayerController : public APlayerController
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DragonForm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings", meta=(AllowPrivateAccess = "true"))
 	UPlayerSettings* Settings = nullptr;
@@ -42,7 +44,9 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Jump(const FInputActionValue& Value);
 	void StopJumping(const FInputActionValue& Value);
+	void OnDragonForm();
 
+	void MoveEnd();
 	virtual void SetupInputComponent() override;
 	
 	// To add mapping context

@@ -64,6 +64,8 @@ void UInteractionComponent::SetInteractionTarget(IInteractable* Interactable)
 
 void UInteractionComponent::OnInteract()
 {
+	if(CurrentState != Nothing) return;
+	
 	if(InteractionTarget.Get())
 	{
 		if(auto * Character = Cast<ARPGCharacter>(GetOwner()))
