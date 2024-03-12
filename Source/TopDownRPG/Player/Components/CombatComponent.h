@@ -59,7 +59,8 @@ public:
 	void SoftLockOff();
 	void SoftLockOn();
 	bool CanDamage();
-
+	void TryDodgeSpecialAttack();
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sword Trace")
 	float SwordTraceRadius = 20;
@@ -88,7 +89,10 @@ protected:
 	TArray<UAnimMontage*> NormalAttackComboAnimations;
 
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
-	UAnimMontage* AirborneComboReaction;
+	TArray<UAnimMontage*> DragonAttackComboAnimations;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	UAnimMontage* AfterDodgeAttack;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat")
 	UAnimMontage* DodgeAnim;
@@ -101,10 +105,12 @@ protected:
 
 	UPROPERTY()
 	AActor* LockTarget = nullptr;
+	UPROPERTY()
 	AActor* SoftLockTarget = nullptr;
 	
 	int currentComboIndex = 0;
 	bool bShouldContinueCombo = false;
+	bool bShouldPerformAfterDodgeAttack = false;
 
 	// Called when the game starts
 	virtual void BeginPlay() override;

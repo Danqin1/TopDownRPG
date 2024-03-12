@@ -89,6 +89,11 @@ void ARPGPlayerController::Move(const FInputActionValue& Value)
 		{
 			return;
 		}
+		if(RPGCharacter->GetState() == Dragon)
+		{
+			MovementVector.X = 0;
+			MovementVector.Y = FMath::Max(0, MovementVector.Y);
+		}
 	}
 	
 	GetCharacter()->AddMovementInput(ForwardDirection, MovementVector.Y);
@@ -122,6 +127,7 @@ void ARPGPlayerController::Jump(const FInputActionValue& Value)
 		if(RPGCharacter->GetState() == Dragon)
 		{
 			RPGCharacter->ToggleFlying();
+			return;
 		}
 	}
 	GetCharacter()->Jump();

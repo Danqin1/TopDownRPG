@@ -6,6 +6,7 @@
 #include "ComponentUtils.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Character.h"
+#include "TopDownRPG/Player/RPGCharacter.h"
 
 
 // Sets default values for this component's properties
@@ -58,8 +59,12 @@ float UInventoryComponent::GetCurrentWeaponDamage()
 
 void UInventoryComponent::ToggleMelee()
 {
-	if(ACharacter* Character  = Cast<ACharacter>(GetOwner()))
+	if(ARPGCharacter* Character  = Cast<ARPGCharacter>(GetOwner()))
 	{
+		if(Character->GetState() == Dragon)
+		{
+			return;
+		}
 		if(!bEquippedWeapon)
 		{
 			if(GetWeaponAnim)

@@ -138,7 +138,7 @@ void ARPGCharacter::ToggleFlying()
 	if(bIsFlying)
 	{
 		GetCharacterMovement()->GravityScale = 0;
-		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		//GetCharacterMovement()->SetMovementMode(MOVE_Flying); defined from AnimNotify take off
 	}
 	else
 	{
