@@ -26,6 +26,7 @@ public:
 	void AddHP(float Value);
 	void RemoveHP(float Value);
 	void AddMaxHP(float Value);
+	void SetMaxHP(float Value);
 	
 	void AddMana(float Value);
 	void RemoveMana(float Value);

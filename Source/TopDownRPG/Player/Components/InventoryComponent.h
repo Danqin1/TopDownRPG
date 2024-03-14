@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "TopDownRPG/TopDownRPG.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -36,13 +37,13 @@ protected:
 	UAnimMontage* HideWeaponAnim;
 
 	bool bEquippedWeapon = false;
+	
+	UFUNCTION()
+	void OnStateChanged(ECharacterState State);
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
-	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	float GetCurrentWeaponDamage();
 	

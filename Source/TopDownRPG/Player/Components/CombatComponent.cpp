@@ -56,7 +56,7 @@ void UCombatComponent::BeginPlay()
 
 void UCombatComponent::OnDodge()
 {
-	if (DodgeAnim && CharacterState->GetState() != Skill)
+	if (DodgeAnim && CharacterState->GetState() != Skill && CharacterState->GetState() != Dragon)
 	{
 		if (ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
 		{
@@ -88,6 +88,10 @@ void UCombatComponent::OnTargetLock()
 {
 	if (!LockTarget)
 	{
+		if(CharacterState->GetState() == Dragon)
+		{
+			return;
+		}
 		if (SoftLockTarget)
 		{
 			if (IEnemy* Enemy = Cast<IEnemy>(SoftLockTarget))
@@ -339,6 +343,11 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 			bAttackChangeRotation = false;
 		}
 	}
+
+	if(SpawnedAirFireBlow && SpawnedAirFireBlow.Get()->IsActive())
+	{
+		HandleAirFireBlowTrace();
+	}
 }
 
 void UCombatComponent::OnAttack()
@@ -375,16 +384,27 @@ void UCombatComponent::OnAttack()
 	{
 		if (ARPGCharacter* RPGPlayer = Cast<ARPGCharacter>(GetOwner()))
 		{
-			auto* Montage = RPGPlayer->GetCurrentMontage();
-			if (DragonAttackComboAnimations.Contains(Montage))
+			if(RPGPlayer->GetCharacterMovement()->MovementMode == MOVE_Flying)
 			{
-				bShouldContinueCombo = true;
+				if(!SpawnedAirFireBlow || !SpawnedAirFireBlow.Get()->IsActive())
+				{
+					SpawnedAirFireBlow = UNiagaraFunctionLibrary::SpawnSystemAttached(AirFireBlow, RPGPlayer->GetMesh(), FName("FireSocket"),
+					FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
+				}
 			}
 			else
 			{
-				currentComboIndex = 0;
-				PlayMontage(DragonAttackComboAnimations[currentComboIndex]);
-				bShouldContinueCombo = false;
+				auto* Montage = RPGPlayer->GetCurrentMontage();
+				if (DragonAttackComboAnimations.Contains(Montage))
+				{
+					bShouldContinueCombo = true;
+				}
+				else
+				{
+					currentComboIndex = 0;
+					PlayMontage(DragonAttackComboAnimations[currentComboIndex]);
+					bShouldContinueCombo = false;
+				}
 			}
 		}
 	}
@@ -504,6 +524,41 @@ void UCombatComponent::TryDamageByAbility(const FVector Position, float Damage, 
 						DamageIndicatorActor->Show(Damage);
 					}
 				}
+			}
+		}
+	}
+
+	DamagedActors.Empty();
+}
+
+
+void UCombatComponent::HandleAirFireBlowTrace()
+{
+	FVector Start = CharacterMesh->GetSocketLocation("FireSocket");
+	FVector End = Start + UKismetMathLibrary::GetForwardVector(CharacterMesh->GetSocketRotation("FireSocket")) * 1000;
+	TArray<FHitResult> OutResults;
+	TArray<AActor*> ToIgnore;
+	ToIgnore.Add(GetOwner());
+	DamagedActors.Empty();
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(), Start, End, 500,
+													 ObjectTypes,
+													 false,
+													 ToIgnore,
+													 EDrawDebugTrace::None, OutResults, true, FLinearColor::Red,
+													 FLinearColor::Green, 2);
+
+	for (FHitResult OutResult : OutResults)
+	{
+		if (auto* Damageable = Cast<IIDamageable>(OutResult.GetActor()))
+		{
+			if (!DamagedActors.Contains(Damageable))
+			{
+				Damageable->Damage(AirFireBlowDamage);
+				DamagedActors.Add(Damageable);
 			}
 		}
 	}

@@ -2,6 +2,7 @@
 
 #include "RPGCharacter.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "RPGPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -118,6 +119,13 @@ void ARPGCharacter::ChangeForm()
 		CameraBoom->TargetArmLength = DragonArmLength;
 		GetCharacterMovement()->MaxAcceleration = 10000;
 		SetState(Dragon);
+		if(ChangeFormFX.Get())
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ChangeFormFX, GetActorLocation(),
+				FRotator::ZeroRotator, FVector::One() * 3);
+		}
+
+		PlayerStatsComponent->SetMaxHP(500);
 	}
 	else
 	{
@@ -127,9 +135,17 @@ void ARPGCharacter::ChangeForm()
 		GetCharacterMovement()->GravityScale = 1;
 		GetCharacterMovement()->MaxAcceleration = 2048;
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		
+		if(ChangeFormFX.Get())
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ChangeFormFX, GetActorLocation(),
+				FRotator::ZeroRotator, FVector::One());
+		}
 		SetState(Nothing);
+
+		PlayerStatsComponent->SetMaxHP(100);
 	}
+
+	
 }
 
 void ARPGCharacter::ToggleFlying()

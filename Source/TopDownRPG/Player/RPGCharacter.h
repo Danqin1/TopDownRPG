@@ -74,6 +74,8 @@ public:
 	FVector DragonSocketOffset;
 	UPROPERTY(EditDefaultsOnly, Category="Dragon")
 	float DragonArmLength = 1000;
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	TObjectPtr<UNiagaraSystem> ChangeFormFX = nullptr;
 	
 	UPROPERTY()
 	UPlayerHUD* PlayerHUD;

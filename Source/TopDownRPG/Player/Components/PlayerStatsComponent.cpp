@@ -70,6 +70,13 @@ void UPlayerStatsComponent::AddMaxHP(float Value)
 	UpdateHUD();
 }
 
+void UPlayerStatsComponent::SetMaxHP(float Value)
+{
+	MaxHP = Value;
+	HP = MaxHP;
+	UpdateHUD();
+}
+
 void UPlayerStatsComponent::AddMana(float Value)
 {
 	Mana = FMathf::Clamp(Mana + Value, 0, MaxMana);

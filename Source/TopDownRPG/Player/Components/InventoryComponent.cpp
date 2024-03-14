@@ -12,11 +12,6 @@
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 	WeaponMeleeHandle = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMeleeHandle");
 	WeaponMeleeBackIdle = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMeleeBackIdle");
 
@@ -24,16 +19,16 @@ UInventoryComponent::UInventoryComponent()
 	WeaponMeleeBackIdle->SetCollisionProfileName("NoCollision");
 }
 
-
-// Called when the game starts
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(ACharacter* Character  = Cast<ACharacter>(GetOwner()))
+	if(ARPGCharacter* Character  = Cast<ARPGCharacter>(GetOwner()))
 	{
 		WeaponMeleeHandle->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "weapon_r");
 		WeaponMeleeBackIdle->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "weapon_back");
+
+		Character->OnStateChanged.AddDynamic(this, &UInventoryComponent::OnStateChanged);
 	}
 
 	if(UEnhancedInputComponent* Input = GetOwner()->GetComponentByClass<UEnhancedInputComponent>())
@@ -42,14 +37,18 @@ void UInventoryComponent::BeginPlay()
 	}
 }
 
-
-// Called every frame
-void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                        FActorComponentTickFunction* ThisTickFunction)
+void UInventoryComponent::OnStateChanged(ECharacterState State)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	if(State == Dragon)
+	{
+		WeaponMeleeHandle->SetVisibility(false);
+		WeaponMeleeBackIdle->SetVisibility(false);
+	}
+	else
+	{
+		WeaponMeleeHandle->SetVisibility(true);
+		WeaponMeleeBackIdle->SetVisibility(true);
+	}
 }
 
 float UInventoryComponent::GetCurrentWeaponDamage()

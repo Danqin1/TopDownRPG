@@ -103,6 +103,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float PushEnemiesStrength = 10;
 
+	UPROPERTY(EditAnywhere, Category = "Dragon")
+	TObjectPtr<UNiagaraSystem> AirFireBlow;
+	UPROPERTY(EditAnywhere, Category = "Dragon")
+	float AirFireBlowDamage = 10;
+
+
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> SpawnedAirFireBlow;
+
 	UPROPERTY()
 	AActor* LockTarget = nullptr;
 	UPROPERTY()
@@ -131,4 +140,5 @@ protected:
 	void OnCharacterStateChanged(ECharacterState State);
 
 	void PlayMontage(UAnimMontage* Montage);
+	void HandleAirFireBlowTrace();
 };
