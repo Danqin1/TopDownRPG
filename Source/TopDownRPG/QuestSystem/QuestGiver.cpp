@@ -53,6 +53,7 @@ void AQuestGiver::InteractionFinished()
 	}
 	if(UIWidget)
 	{
+		UIWidget->OnClose.RemoveDynamic(this, &AQuestGiver::InteractionFinished);
 		UIWidget->RemoveFromParent();
 		UIWidget->Destruct();
 		UIWidget = nullptr;
